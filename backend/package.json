@@ -6,6 +6,7 @@
     "node": ">=22.0.0"
   },
   "scripts": {
+    "build": "cd ../frontend && npm install && npm run build && xcopy /E /I /Y dist ..\\backend\\public > nul 2>&1 || cp -r dist ../backend/public",
     "start": "node --experimental-sqlite server.js",
     "dev": "nodemon --exec \"node --experimental-sqlite\" server.js",
     "seed": "node --experimental-sqlite seed.js"

@@ -59,6 +59,16 @@ app.use('/api/reports', require('./routes/reports'));
 app.use('/api/settings', require('./routes/settings'));
 app.use('/api/leaderboard', require('./routes/leaderboard'));
 
+// Serve frontend static files in production
+const frontendDist = path.join(__dirname, 'public');
+if (require('fs').existsSync(frontendDist)) {
+  app.use(express.static(frontendDist));
+  // For any non-API route, serve index.html (React SPA routing)
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(frontendDist, 'index.html'));
+  });
+}
+
 // Cron jobs
 // Daily report at 11:00 PM
 cron.schedule('0 23 * * *', async () => {
@@ -88,8 +98,8 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Internal server error' });
 });
 
-// 404 handler
-app.use((req, res) => {
+// 404 handler (API routes only)
+app.use('/api/*', (req, res) => {
   res.status(404).json({ error: 'Route not found' });
 });
 
