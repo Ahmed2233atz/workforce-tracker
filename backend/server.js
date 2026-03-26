@@ -18,6 +18,19 @@ const cors = require('cors');
 const cron = require('node-cron');
 const { generateDailyReport, generateWeeklyReport } = require('./services/reports');
 
+// Auto-seed the database on first run if no users exist
+const db = require('./db');
+const userCount = db.prepare('SELECT COUNT(*) as count FROM users').get();
+if (userCount.count === 0) {
+  console.log('🌱 No users found — running first-time database seed...');
+  try {
+    require('./seed');
+    console.log('✅ Database seeded successfully!');
+  } catch (e) {
+    console.error('⚠️ Seed error:', e.message);
+  }
+}
+
 const app = express();
 const PORT = process.env.PORT || 3001;
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
