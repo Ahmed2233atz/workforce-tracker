@@ -1,0 +1,26 @@
+# Dependencies
+node_modules/
+*/node_modules/
+
+# Environment files
+.env
+backend/.env
+frontend/.env
+frontend/.env.local
+
+# Build output
+frontend/dist/
+frontend/build/
+
+# Database (don't commit production DB)
+backend/workforce.db
+backend/workforce.db-wal
+backend/workforce.db-shm
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
