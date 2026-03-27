@@ -69,22 +69,26 @@ router.put('/profile', authenticate, (req, res) => {
 
   if (!name?.trim()) return res.status(400).json({ error: 'Name is required' });
 
+  // Fetch full user row (middleware strips password_hash for security)
+  const fullUser = db.prepare('SELECT * FROM users WHERE id = ?').get(req.user.id);
+  if (!fullUser) return res.status(404).json({ error: 'User not found' });
+
   // If changing password, verify current password first
   if (new_password) {
     if (!current_password) return res.status(400).json({ error: 'Current password is required to set a new password' });
-    const ok = bcrypt.compareSync(current_password, req.user.password_hash);
+    const ok = bcrypt.compareSync(current_password, fullUser.password_hash);
     if (!ok) return res.status(401).json({ error: 'Current password is incorrect' });
     if (new_password.length < 6) return res.status(400).json({ error: 'New password must be at least 6 characters' });
   }
 
   // Check email uniqueness if changed
-  if (email && email.toLowerCase().trim() !== req.user.email) {
-    const clash = db.prepare('SELECT id FROM users WHERE email = ? AND id != ?').get(email.toLowerCase().trim(), req.user.id);
+  const newEmail = email ? email.toLowerCase().trim() : fullUser.email;
+  if (newEmail !== fullUser.email) {
+    const clash = db.prepare('SELECT id FROM users WHERE email = ? AND id != ?').get(newEmail, req.user.id);
     if (clash) return res.status(409).json({ error: 'Email already in use' });
   }
 
-  const newHash = new_password ? bcrypt.hashSync(new_password, 10) : req.user.password_hash;
-  const newEmail = email ? email.toLowerCase().trim() : req.user.email;
+  const newHash = new_password ? bcrypt.hashSync(new_password, 10) : fullUser.password_hash;
 
   db.prepare(`
     UPDATE users SET name = ?, email = ?, password_hash = ?, updated_at = datetime('now') WHERE id = ?
