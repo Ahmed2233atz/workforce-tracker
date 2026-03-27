@@ -9,7 +9,7 @@ import { format, parseISO } from 'date-fns'
 import api from '../../api/axios.js'
 import StatCard from '../../components/StatCard.jsx'
 
-const TABS = ['Hours History', 'Notes & Warnings', 'Pending Backfills']
+const TABS = ['Hours History', 'Credentials', 'Notes & Warnings', 'Pending Backfills']
 
 export default function WorkerDetail() {
   const { id } = useParams()
@@ -25,19 +25,27 @@ export default function WorkerDetail() {
   const [startDate, setStartDate] = useState('')
   const [endDate, setEndDate] = useState('')
   const [page, setPage] = useState(1)
+  const [credentials, setCredentials] = useState([])
+  const [credForm, setCredForm] = useState({ platform: '', username: '', password: '', notes: '' })
+  const [editCred, setEditCred] = useState(null)
+  const [savingCred, setSavingCred] = useState(false)
+  const [showCredForm, setShowCredForm] = useState(false)
+  const [showPasswords, setShowPasswords] = useState({})
 
   const fetchAll = async () => {
     try {
-      const [wRes, hRes, nRes, bRes] = await Promise.all([
+      const [wRes, hRes, nRes, bRes, cRes] = await Promise.all([
         api.get(`/workers/${id}`),
         api.get(`/workers/${id}/hours`, { params: { page, limit: 15, start_date: startDate || undefined, end_date: endDate || undefined } }),
         api.get(`/workers/${id}/notes`),
         api.get('/hours/pending-backfills'),
+        api.get(`/workers/${id}/credentials`),
       ])
       setWorker(wRes.data)
       setHours(hRes.data)
       setNotes(nRes.data)
       setBackfills(bRes.data.filter((b) => b.user_id === parseInt(id)))
+      setCredentials(cRes.data)
     } catch {
       toast.error('Failed to load worker data')
     } finally {
@@ -72,6 +80,43 @@ export default function WorkerDetail() {
     } catch {
       toast.error('Failed to approve')
     }
+  }
+
+  const handleSaveCred = async (e) => {
+    e.preventDefault()
+    if (!credForm.platform.trim()) { toast.error('Platform name is required'); return }
+    setSavingCred(true)
+    try {
+      if (editCred) {
+        await api.put(`/workers/${id}/credentials/${editCred.id}`, credForm)
+        toast.success('Credentials updated')
+      } else {
+        await api.post(`/workers/${id}/credentials`, credForm)
+        toast.success('Credentials added')
+      }
+      setCredForm({ platform: '', username: '', password: '', notes: '' })
+      setEditCred(null)
+      setShowCredForm(false)
+      const cRes = await api.get(`/workers/${id}/credentials`)
+      setCredentials(cRes.data)
+    } catch (err) {
+      toast.error(err.response?.data?.error || 'Failed to save credentials')
+    } finally {
+      setSavingCred(false)
+    }
+  }
+
+  const handleDeleteCred = async (credId) => {
+    if (!confirm('Delete these credentials?')) return
+    await api.delete(`/workers/${id}/credentials/${credId}`)
+    setCredentials(prev => prev.filter(c => c.id !== credId))
+    toast.success('Credentials deleted')
+  }
+
+  const startEditCred = (cred) => {
+    setCredForm({ platform: cred.platform, username: cred.username || '', password: cred.password || '', notes: cred.notes || '' })
+    setEditCred(cred)
+    setShowCredForm(true)
   }
 
   const exportCsv = () => {
@@ -181,7 +226,7 @@ export default function WorkerDetail() {
               }`}
             >
               {tab}
-              {i === 2 && backfills.length > 0 && (
+              {i === 3 && backfills.length > 0 && (
                 <span className="ml-1.5 bg-warning-500 text-white text-xs rounded-full px-1.5 py-0.5">{backfills.length}</span>
               )}
             </button>
@@ -264,8 +309,95 @@ export default function WorkerDetail() {
             </div>
           )}
 
-          {/* Notes & Warnings */}
+          {/* Credentials */}
           {activeTab === 1 && (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <p className="text-sm text-gray-500">Platform login credentials visible to this worker.</p>
+                <button
+                  className="btn-primary text-sm"
+                  onClick={() => { setCredForm({ platform: '', username: '', password: '', notes: '' }); setEditCred(null); setShowCredForm(!showCredForm) }}
+                >
+                  + Add Credentials
+                </button>
+              </div>
+
+              {showCredForm && (
+                <form onSubmit={handleSaveCred} className="bg-gray-50 border border-gray-200 rounded-xl p-4 space-y-3">
+                  <h3 className="font-medium text-gray-900">{editCred ? 'Edit Credentials' : 'Add New Credentials'}</h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="input-label">Platform Name *</label>
+                      <input className="input" placeholder="e.g. Hubstaff" value={credForm.platform} onChange={e => setCredForm({...credForm, platform: e.target.value})} />
+                    </div>
+                    <div>
+                      <label className="input-label">Username / Email</label>
+                      <input className="input" placeholder="login@example.com" value={credForm.username} onChange={e => setCredForm({...credForm, username: e.target.value})} />
+                    </div>
+                    <div>
+                      <label className="input-label">Password</label>
+                      <input className="input" placeholder="Password" value={credForm.password} onChange={e => setCredForm({...credForm, password: e.target.value})} />
+                    </div>
+                    <div>
+                      <label className="input-label">Notes (optional)</label>
+                      <input className="input" placeholder="e.g. Use desktop app only" value={credForm.notes} onChange={e => setCredForm({...credForm, notes: e.target.value})} />
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <button type="submit" className="btn-primary text-sm" disabled={savingCred}>{savingCred ? 'Saving...' : editCred ? 'Save Changes' : 'Add'}</button>
+                    <button type="button" className="btn-secondary text-sm" onClick={() => { setShowCredForm(false); setEditCred(null) }}>Cancel</button>
+                  </div>
+                </form>
+              )}
+
+              {credentials.length === 0 ? (
+                <p className="text-gray-400 text-center py-8">No credentials added yet. Click "+ Add Credentials" to start.</p>
+              ) : (
+                <div className="space-y-3">
+                  {credentials.map(cred => (
+                    <div key={cred.id} className="border border-gray-200 rounded-xl p-4 bg-white">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="space-y-2 flex-1">
+                          <div className="flex items-center gap-2">
+                            <span className="font-semibold text-gray-900 text-base">🔐 {cred.platform}</span>
+                          </div>
+                          {cred.username && (
+                            <div className="flex items-center gap-2 text-sm">
+                              <span className="text-gray-500 w-20">Username:</span>
+                              <span className="font-mono bg-gray-100 px-2 py-0.5 rounded text-gray-800">{cred.username}</span>
+                            </div>
+                          )}
+                          {cred.password && (
+                            <div className="flex items-center gap-2 text-sm">
+                              <span className="text-gray-500 w-20">Password:</span>
+                              <span className="font-mono bg-gray-100 px-2 py-0.5 rounded text-gray-800">
+                                {showPasswords[cred.id] ? cred.password : '••••••••'}
+                              </span>
+                              <button
+                                type="button"
+                                className="text-xs text-primary-600 hover:underline"
+                                onClick={() => setShowPasswords(prev => ({...prev, [cred.id]: !prev[cred.id]}))}
+                              >
+                                {showPasswords[cred.id] ? 'Hide' : 'Show'}
+                              </button>
+                            </div>
+                          )}
+                          {cred.notes && <p className="text-xs text-gray-400 italic">{cred.notes}</p>}
+                        </div>
+                        <div className="flex gap-2 flex-shrink-0">
+                          <button className="text-xs text-primary-600 hover:underline font-medium" onClick={() => startEditCred(cred)}>Edit</button>
+                          <button className="text-xs text-danger-600 hover:underline font-medium" onClick={() => handleDeleteCred(cred.id)}>Delete</button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Notes & Warnings */}
+          {activeTab === 2 && (
             <div>
               <form onSubmit={handleAddNote} className="bg-gray-50 rounded-xl p-4 mb-6 border border-gray-200">
                 <h3 className="font-medium text-gray-900 mb-3">Add Note or Warning</h3>
@@ -312,7 +444,7 @@ export default function WorkerDetail() {
           )}
 
           {/* Pending Backfills */}
-          {activeTab === 2 && (
+          {activeTab === 3 && (
             <div>
               {backfills.length === 0 ? (
                 <p className="text-gray-400 text-center py-8">No pending backfill requests</p>

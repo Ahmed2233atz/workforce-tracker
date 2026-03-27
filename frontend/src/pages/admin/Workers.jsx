@@ -81,6 +81,11 @@ function WorkerForm({ form, setForm, errors, submitting, onSubmit, onCancel, isE
           />
           <p className="text-xs text-gray-400 mt-1">Workers will see this on their dashboard. A notification will be sent when updated.</p>
         </div>
+        {!isEdit && (
+          <div className="bg-blue-50 border border-blue-200 rounded-xl p-3 text-sm text-blue-700">
+            💡 After adding the worker, open their profile to add platform credentials (Hubstaff, etc.)
+          </div>
+        )}
       </div>
       <div className="modal-footer">
         <button type="button" className="btn-secondary" onClick={onCancel}>

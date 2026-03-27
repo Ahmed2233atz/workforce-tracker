@@ -97,6 +97,20 @@ db.exec(`
   )
 `);
 
+db.exec(`
+  CREATE TABLE IF NOT EXISTS credentials (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    worker_id INTEGER NOT NULL,
+    platform TEXT NOT NULL,
+    username TEXT,
+    password TEXT,
+    notes TEXT,
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+    FOREIGN KEY (worker_id) REFERENCES users(id)
+  )
+`);
+
 // Insert default settings
 const defaultSettings = [
   ['daily_target_hours', '10'],

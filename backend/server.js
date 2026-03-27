@@ -99,6 +99,12 @@ app.use('/api/reports', require('./routes/reports'));
 app.use('/api/settings', require('./routes/settings'));
 app.use('/api/leaderboard', require('./routes/leaderboard'));
 app.use('/api/notifications', require('./routes/notifications'));
+app.use('/api/workers/:id/credentials', require('./routes/credentials'));
+app.get('/api/me/credentials', require('./middleware/auth').authenticate, (req, res) => {
+  const db = require('./db');
+  const creds = db.prepare('SELECT * FROM credentials WHERE worker_id = ? ORDER BY created_at ASC').all(req.user.id);
+  return res.json(creds);
+});
 
 // Serve frontend static files in production
 const frontendDist = path.join(__dirname, 'public');
