@@ -116,8 +116,8 @@ export default function AdminDashboard() {
 
       {/* Stats row */}
       {loading ? (
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          {[...Array(4)].map((_, i) => (
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+          {[...Array(5)].map((_, i) => (
             <div key={i} className="card">
               <div className="skeleton h-4 w-24 mb-3 rounded" />
               <div className="skeleton h-8 w-16 rounded" />
@@ -125,7 +125,7 @@ export default function AdminDashboard() {
           ))}
         </div>
       ) : (
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
           <StatCard
             title="Active Today"
             value={`${data?.today_stats.logged_today || 0}/${data?.today_stats.total_workers || 0}`}
@@ -153,6 +153,13 @@ export default function AdminDashboard() {
             subtitle={`${data?.today_stats.not_logged || 0} not logged, ${data?.today_stats.incomplete || 0} incomplete`}
             icon="⚠️"
             color="amber"
+          />
+          <StatCard
+            title="Invoice Due (Week)"
+            value={`$${(data?.weekly_invoice_total || 0).toFixed(2)}`}
+            subtitle="Total payroll this week"
+            icon="💵"
+            color="emerald"
           />
         </div>
       )}

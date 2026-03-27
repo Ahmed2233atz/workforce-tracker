@@ -93,6 +93,25 @@ router.get('/admin', authenticate, requireAdmin, (req, res) => {
     LIMIT 5
   `).all(weekStart, today);
 
+  // Weekly invoice: all workers' hours this week × their department rate
+  const HOURLY_RATES = {
+    'Russian Data Annotator': 8,
+    'Chinese Data Annotator': 8,
+    'English Data Annotator': 5,
+    'Egyptian English Data Annotator': 3,
+  };
+  const weeklyWorkerHours = db.prepare(`
+    SELECT u.id, u.name, u.department, SUM(h.total_hours) AS total_hours
+    FROM hours_logs h
+    JOIN users u ON u.id = h.user_id
+    WHERE h.date >= ? AND h.date <= ? AND u.is_active = 1
+    GROUP BY u.id
+  `).all(weekStart, today);
+  const weeklyInvoiceTotal = weeklyWorkerHours.reduce((sum, w) => {
+    const rate = HOURLY_RATES[w.department] || 0;
+    return sum + (w.total_hours || 0) * rate;
+  }, 0);
+
   return res.json({
     today_stats: {
       total_workers: allWorkers.length,
@@ -107,6 +126,7 @@ router.get('/admin', authenticate, requireAdmin, (req, res) => {
     department_stats: deptStats,
     daily_totals_last_30_days: dailyTotals,
     top_performers: topPerformers,
+    weekly_invoice_total: parseFloat(weeklyInvoiceTotal.toFixed(2)),
   });
 });
 

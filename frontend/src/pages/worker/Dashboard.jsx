@@ -10,6 +10,13 @@ import { useAuth } from '../../context/AuthContext.jsx'
 import StatCard from '../../components/StatCard.jsx'
 import api from '../../api/axios.js'
 
+const HOURLY_RATES = {
+  'Russian Data Annotator': 8,
+  'Chinese Data Annotator': 8,
+  'English Data Annotator': 5,
+  'Egyptian English Data Annotator': 3,
+}
+
 export default function WorkerDashboard() {
   const { user } = useAuth()
   const navigate = useNavigate()
@@ -175,7 +182,7 @@ export default function WorkerDashboard() {
       ) : null}
 
       {/* Stats row */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
           title="This Week"
           value={`${data?.weekly_hours || 0}h`}
@@ -196,6 +203,13 @@ export default function WorkerDashboard() {
           subtitle="Total logged hours"
           icon="📈"
           color="green"
+        />
+        <StatCard
+          title="Weekly Earnings"
+          value={`$${((data?.weekly_hours || 0) * (HOURLY_RATES[user?.department] || 0)).toFixed(2)}`}
+          subtitle={HOURLY_RATES[user?.department] ? `$${HOURLY_RATES[user?.department]}/hr · ${user?.department}` : 'Rate not set for your project'}
+          icon="💰"
+          color="emerald"
         />
       </div>
 
