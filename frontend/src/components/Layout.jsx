@@ -14,6 +14,7 @@ const workerNav = [
   { to: '/worker/dashboard', icon: '🏠', label: 'Dashboard' },
   { to: '/worker/log-hours', icon: '⏱️', label: 'Log Hours' },
   { to: '/worker/resources', icon: '📚', label: 'Resources' },
+  { to: '/worker/login-info', icon: '🔐', label: 'Login Info' },
 ]
 
 function getInitials(name) {
@@ -36,10 +37,6 @@ export default function Layout() {
   const [unreadCount, setUnreadCount] = useState(0)
   const [showNotifs, setShowNotifs] = useState(false)
   const [notifications, setNotifications] = useState([])
-  const [credentials, setCredentials] = useState([])
-  const [showCreds, setShowCreds] = useState(false)
-  const [showPasswords, setShowPasswords] = useState({})
-
   useEffect(() => {
     if (user?.role !== 'worker') return
     const fetchNotifs = async () => {
@@ -49,14 +46,7 @@ export default function Layout() {
         setNotifications(res.data.notifications || [])
       } catch {}
     }
-    const fetchCreds = async () => {
-      try {
-        const res = await api.get('/me/credentials')
-        setCredentials(res.data || [])
-      } catch {}
-    }
     fetchNotifs()
-    fetchCreds()
     const interval = setInterval(fetchNotifs, 60000)
     return () => clearInterval(interval)
   }, [user])
@@ -125,87 +115,8 @@ export default function Layout() {
           ))}
         </nav>
 
-        {/* Credentials (workers only) */}
-        {user?.role === 'worker' && credentials.length > 0 && (
-          <div className="border-t border-slate-700">
-            <button
-              onClick={() => setShowCreds(!showCreds)}
-              className="w-full flex items-center justify-between px-6 py-3 hover:bg-slate-700/40 transition-colors text-left"
-            >
-              <span className="text-slate-300 text-sm font-semibold">🔐 My Login Credentials</span>
-              <span className={`text-slate-400 text-sm transition-transform duration-200 ${showCreds ? 'rotate-180' : ''}`}>▾</span>
-            </button>
 
-            {showCreds && (
-              <div className="px-3 pb-4 space-y-4">
-                {credentials.map(cred => (
-                  <div key={cred.id} className="rounded-xl overflow-hidden border border-slate-600">
-
-                    {/* Platform header */}
-                    <div className="bg-slate-700 px-3 py-2">
-                      <p className="text-white text-sm font-bold">{cred.platform}</p>
-                    </div>
-
-                    {/* Hubstaff-specific instructions */}
-                    {cred.platform.toLowerCase().includes('hubstaff') && (
-                      <div className="bg-amber-900/40 border-b border-slate-600 px-3 py-3 space-y-2">
-                        <p className="text-amber-300 text-xs font-semibold uppercase tracking-wide">⚠️ Instructions</p>
-                        <ul className="space-y-1.5 text-xs text-amber-100">
-                          <li className="flex items-start gap-1.5">
-                            <span className="flex-shrink-0 mt-0.5">▸</span>
-                            <span>You <strong>must run the timer</strong> while working. Work without the timer will not be counted.</span>
-                          </li>
-                          <li className="flex items-start gap-1.5">
-                            <span className="flex-shrink-0 mt-0.5">▸</span>
-                            <span>Use the <strong>desktop application</strong> only.</span>
-                          </li>
-                          <li className="flex items-start gap-1.5">
-                            <span className="flex-shrink-0 mt-0.5">▸</span>
-                            <span>One of these projects must appear:</span>
-                          </li>
-                        </ul>
-                        <div className="flex gap-2 flex-wrap pt-0.5">
-                          <span className="bg-green-800/60 border border-green-600 text-green-200 text-xs px-2 py-0.5 rounded-md font-medium">✅ Multimango</span>
-                          <span className="bg-green-800/60 border border-green-600 text-green-200 text-xs px-2 py-0.5 rounded-md font-medium">✅ Multimango Multilingual</span>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Show credentials button */}
-                    <div className="bg-slate-800/60 px-3 py-2.5">
-                      <button
-                        onClick={() => setShowPasswords(p => ({ ...p, [cred.id]: !p[cred.id] }))}
-                        className="w-full text-xs font-semibold text-primary-400 hover:text-primary-300 flex items-center justify-center gap-1.5 py-1 rounded-lg hover:bg-slate-700/50 transition-colors"
-                      >
-                        {showPasswords[cred.id] ? '🙈 Hide' : '👁️ Show'} {cred.platform} Login Credentials
-                      </button>
-
-                      {showPasswords[cred.id] && (
-                        <div className="mt-2 space-y-1.5 border-t border-slate-600 pt-2">
-                          {cred.username && (
-                            <div className="flex items-center gap-2 text-xs">
-                              <span className="text-slate-400 w-12 flex-shrink-0">User:</span>
-                              <span className="font-mono text-slate-200 bg-slate-700 px-2 py-0.5 rounded break-all">{cred.username}</span>
-                            </div>
-                          )}
-                          {cred.password && (
-                            <div className="flex items-center gap-2 text-xs">
-                              <span className="text-slate-400 w-12 flex-shrink-0">Pass:</span>
-                              <span className="font-mono text-slate-200 bg-slate-700 px-2 py-0.5 rounded break-all">{cred.password}</span>
-                            </div>
-                          )}
-                        </div>
-                      )}
-                    </div>
-
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* User section at bottom */}
+{/* User section at bottom */}
         <div className="px-3 py-4 border-t border-slate-700">
           <div className="flex items-center gap-3 px-3 py-2 rounded-lg bg-slate-700/50">
             <div className="w-8 h-8 bg-primary-600 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0">

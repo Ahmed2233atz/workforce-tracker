@@ -11,6 +11,7 @@ import Settings from './pages/admin/Settings.jsx'
 import WorkerDashboard from './pages/worker/Dashboard.jsx'
 import LogHours from './pages/worker/LogHours.jsx'
 import Resources from './pages/worker/Resources.jsx'
+import LoginInfo from './pages/worker/LoginInfo.jsx'
 
 export default function App() {
   return (
@@ -36,6 +37,7 @@ export default function App() {
               <Route path="/worker/dashboard" element={<WorkerDashboard />} />
               <Route path="/worker/log-hours" element={<LogHours />} />
               <Route path="/worker/resources" element={<Resources />} />
+              <Route path="/worker/login-info" element={<LoginInfo />} />
             </Route>
           </Route>
 
