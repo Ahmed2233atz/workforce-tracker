@@ -16,6 +16,54 @@ export default function Resources() {
         </p>
       </div>
 
+      {/* Quality Tips — TOP */}
+      <div className="space-y-4">
+        <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider">💡 Quality Tips</h2>
+        <div className="card flex items-center justify-between gap-4 hover:shadow-md transition-shadow border-l-4 border-l-yellow-400">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-yellow-50 border border-yellow-100 flex items-center justify-center text-2xl flex-shrink-0">⭐</div>
+            <div>
+              <p className="font-semibold text-gray-900">General Tips & Tricks to Achieve High Quality</p>
+              <p className="text-sm text-gray-400">Read this first to improve your quality across all projects</p>
+            </div>
+          </div>
+          <a
+            href="https://docs.google.com/document/d/1ZmWJWd74nYvSqL9rni0rUDzpri521Sp89ag5BfzTt3w/edit?usp=sharing"
+            target="_blank"
+            rel="noreferrer"
+            className="btn-primary whitespace-nowrap flex-shrink-0"
+          >
+            📄 Open Document
+          </a>
+        </div>
+      </div>
+
+      {/* Contact Support banner */}
+      <div className="rounded-2xl bg-gradient-to-r from-indigo-50 to-purple-50 border border-indigo-200 p-5 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+        <div className="text-3xl flex-shrink-0">✅</div>
+        <div className="flex-1">
+          <p className="font-bold text-indigo-900 text-sm">Read the tips and have all the required tools installed?</p>
+          <p className="text-indigo-700 text-sm mt-1">
+            Open the <strong>Support chat</strong> on the bottom-right of the screen and send a message asking to have your <strong>login credentials added</strong>. We'll get back to you shortly.
+          </p>
+        </div>
+        <div className="text-2xl flex-shrink-0">💬</div>
+      </div>
+
+      {/* Warning before instructions */}
+      <div className="rounded-2xl bg-red-50 border-2 border-red-200 p-5 flex items-start gap-4">
+        <div className="text-2xl flex-shrink-0">🚫</div>
+        <div>
+          <p className="font-bold text-red-800 text-sm">Do not read the project instructions yet</p>
+          <p className="text-red-700 text-sm mt-1">
+            Wait until your <strong>login credentials have been added</strong> to your account. Some projects may not be available to you, and reading the instructions for unavailable projects wastes your time.
+          </p>
+          <p className="text-red-600 text-sm mt-2 font-medium">
+            Your manager will notify you once your credentials are ready — then you can proceed.
+          </p>
+        </div>
+      </div>
+
       {/* Project Instructions */}
       <div className="space-y-4">
         <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider">📂 Project Instructions</h2>
@@ -40,28 +88,6 @@ export default function Resources() {
             </a>
           </div>
         ))}
-      </div>
-
-      {/* General Tips */}
-      <div className="space-y-4">
-        <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider">💡 Quality Tips</h2>
-        <div className="card flex items-center justify-between gap-4 hover:shadow-md transition-shadow border-l-4 border-l-yellow-400">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-yellow-50 border border-yellow-100 flex items-center justify-center text-2xl flex-shrink-0">⭐</div>
-            <div>
-              <p className="font-semibold text-gray-900">General Tips & Tricks to Achieve High Quality</p>
-              <p className="text-sm text-gray-400">Read this to improve your quality across all projects</p>
-            </div>
-          </div>
-          <a
-            href="https://docs.google.com/document/d/1ZmWJWd74nYvSqL9rni0rUDzpri521Sp89ag5BfzTt3w/edit?usp=sharing"
-            target="_blank"
-            rel="noreferrer"
-            className="btn-primary whitespace-nowrap flex-shrink-0"
-          >
-            📄 Open Document
-          </a>
-        </div>
       </div>
 
       {/* Request section */}
