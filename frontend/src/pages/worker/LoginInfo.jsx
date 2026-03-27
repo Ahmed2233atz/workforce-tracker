@@ -114,57 +114,6 @@ export default function LoginInfo() {
         </div>
       </div>
 
-      {/* Upwork Platform */}
-      <div className="card border border-gray-200 space-y-4">
-        <div className="flex items-center justify-between gap-4 flex-wrap">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-2xl flex-shrink-0">💼</div>
-            <div>
-              <p className="font-bold text-gray-900 text-lg">Upwork</p>
-              <p className="text-sm text-gray-500">Freelance platform — daily manual time logging required</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 space-y-3">
-          <p className="font-semibold text-emerald-900 text-sm flex items-center gap-2">📋 How to Add Your Hours Daily</p>
-          <ul className="space-y-3 text-sm text-emerald-800">
-            <li className="flex items-start gap-2">
-              <span className="flex-shrink-0 font-bold text-emerald-700">1.</span>
-              <span>At the end of each workday, <strong>finish your work</strong> first, then go to your contract on Upwork.</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="flex-shrink-0 font-bold text-emerald-700">2.</span>
-              <span>Click <strong>"Add Manual Time"</strong> on your contract.</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="flex-shrink-0 font-bold text-emerald-700">3.</span>
-              <span>Enter a time range that equals your total hours worked. For example, if you worked <strong>2 hours</strong>, set start time to <strong>2:00</strong> and end time to <strong>4:00</strong>.</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="flex-shrink-0 font-bold text-emerald-700">4.</span>
-              <span>You can choose <strong>any time range</strong> you want — the important thing is that the total matches the hours you actually worked.</span>
-            </li>
-          </ul>
-
-          <div className="bg-white border border-emerald-200 rounded-lg p-3 mt-1">
-            <p className="text-emerald-800 text-sm font-semibold mb-2">📌 Example:</p>
-            <div className="flex items-center gap-3 text-sm">
-              <div className="bg-emerald-100 rounded-lg px-3 py-2 text-center">
-                <p className="text-xs text-emerald-600 font-medium">Start</p>
-                <p className="font-bold text-emerald-900">2:00</p>
-              </div>
-              <span className="text-emerald-500 font-bold text-lg">→</span>
-              <div className="bg-emerald-100 rounded-lg px-3 py-2 text-center">
-                <p className="text-xs text-emerald-600 font-medium">End</p>
-                <p className="font-bold text-emerald-900">4:00</p>
-              </div>
-              <span className="text-emerald-700 font-semibold">= 2 hours logged ✅</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* My Credentials */}
       <div className="space-y-3">
         <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider">🔑 My Login Credentials</h2>

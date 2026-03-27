@@ -19,6 +19,7 @@ const workerNav = [
   { to: '/worker/log-hours', icon: '⏱️', label: 'Log Hours' },
   { to: '/worker/resources', icon: '📚', label: 'Resources' },
   { to: '/worker/login-info', icon: '🔐', label: 'Login Info' },
+  { to: '/worker/upwork-guide', icon: '💼', label: 'Upwork Hours' },
 ]
 
 function getInitials(name) {
