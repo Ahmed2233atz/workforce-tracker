@@ -12,6 +12,7 @@ export default function Settings() {
   })
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [resetting, setResetting] = useState(false)
 
   useEffect(() => {
     api.get('/settings')
@@ -36,6 +37,33 @@ export default function Settings() {
       toast.error(err.response?.data?.error || 'Failed to save settings')
     } finally {
       setSaving(false)
+    }
+  }
+
+  const handleResetHours = async () => {
+    if (!window.confirm('Are you sure you want to delete ALL hours logs? This cannot be undone.')) return
+    setResetting(true)
+    try {
+      await api.delete('/settings/reset-hours')
+      toast.success('All hours data has been reset successfully')
+    } catch (err) {
+      toast.error(err.response?.data?.error || 'Failed to reset data')
+    } finally {
+      setResetting(false)
+    }
+  }
+
+  const handleResetAll = async () => {
+    if (!window.confirm('Are you sure you want to delete ALL workers and hours data? Only admin accounts will remain. This cannot be undone.')) return
+    if (!window.confirm('FINAL WARNING: This will permanently delete everything. Are you absolutely sure?')) return
+    setResetting(true)
+    try {
+      await api.delete('/settings/reset-all')
+      toast.success('All data has been reset. Only admin accounts remain.')
+    } catch (err) {
+      toast.error(err.response?.data?.error || 'Failed to reset data')
+    } finally {
+      setResetting(false)
     }
   }
 
@@ -177,6 +205,42 @@ export default function Settings() {
           </button>
         </div>
       </form>
+
+      {/* Danger Zone */}
+      <div className="card border-2 border-red-200 bg-red-50">
+        <h2 className="font-semibold text-red-700 text-lg mb-1">⚠️ Danger Zone</h2>
+        <p className="text-sm text-red-600 mb-6">These actions are permanent and cannot be undone.</p>
+        <div className="space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 bg-white rounded-xl border border-red-200">
+            <div>
+              <p className="font-medium text-gray-900">Reset All Hours Data</p>
+              <p className="text-sm text-gray-500 mt-0.5">Delete all logged hours for all workers. Worker accounts are kept.</p>
+            </div>
+            <button
+              type="button"
+              onClick={handleResetHours}
+              disabled={resetting}
+              className="btn px-5 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-medium text-sm transition-colors disabled:opacity-50 whitespace-nowrap"
+            >
+              {resetting ? 'Resetting...' : '🗑️ Reset Hours'}
+            </button>
+          </div>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 bg-white rounded-xl border border-red-200">
+            <div>
+              <p className="font-medium text-gray-900">Reset Everything</p>
+              <p className="text-sm text-gray-500 mt-0.5">Delete all workers and hours. Only admin accounts (Ahmed & Abdo) will remain.</p>
+            </div>
+            <button
+              type="button"
+              onClick={handleResetAll}
+              disabled={resetting}
+              className="btn px-5 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl font-medium text-sm transition-colors disabled:opacity-50 whitespace-nowrap"
+            >
+              {resetting ? 'Resetting...' : '💥 Reset Everything'}
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }

@@ -3,20 +3,12 @@ import { useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import { useAuth } from '../context/AuthContext.jsx'
 
-const demoAccounts = [
-  { role: 'Admin', email: 'ahmed@company.com', password: 'admin123', color: 'indigo' },
-  { role: 'Admin', email: 'abdo@company.com', password: 'admin123', color: 'indigo' },
-  { role: 'Worker', email: 'alice@company.com', password: 'worker123', color: 'emerald' },
-  { role: 'Worker', email: 'bob@company.com', password: 'worker123', color: 'blue' },
-]
-
 export default function Login() {
   const { login } = useAuth()
   const navigate = useNavigate()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
-  const [showDemo, setShowDemo] = useState(false)
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -35,12 +27,6 @@ export default function Login() {
     } finally {
       setLoading(false)
     }
-  }
-
-  const fillDemo = (account) => {
-    setEmail(account.email)
-    setPassword(account.password)
-    setShowDemo(false)
   }
 
   return (
@@ -109,43 +95,6 @@ export default function Login() {
               )}
             </button>
           </form>
-
-          {/* Demo Accounts */}
-          <div className="mt-6">
-            <button
-              onClick={() => setShowDemo(!showDemo)}
-              className="w-full flex items-center justify-between text-sm text-primary-200 hover:text-white transition-colors py-2"
-            >
-              <span className="flex items-center gap-2">
-                <span>🔑</span>
-                <span>Demo accounts</span>
-              </span>
-              <span className="text-primary-300">{showDemo ? '▲' : '▼'}</span>
-            </button>
-
-            {showDemo && (
-              <div className="mt-3 space-y-2 fade-in">
-                {demoAccounts.map((account) => (
-                  <button
-                    key={account.email}
-                    onClick={() => fillDemo(account)}
-                    className="w-full flex items-center justify-between p-3 bg-white/10 hover:bg-white/20 rounded-xl border border-white/10 transition-colors text-left"
-                  >
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <span className={`badge ${account.role === 'Admin' ? 'bg-primary-500/30 text-primary-100' : 'bg-green-500/30 text-green-100'}`}>
-                          {account.role}
-                        </span>
-                      </div>
-                      <p className="text-white text-xs mt-1">{account.email}</p>
-                      <p className="text-primary-300 text-xs">{account.password}</p>
-                    </div>
-                    <span className="text-primary-300 text-xs">Click to fill →</span>
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
         </div>
 
         <p className="text-center text-primary-400 text-xs mt-6">

@@ -81,4 +81,18 @@ router.put('/', authenticate, requireAdmin, (req, res) => {
   return res.json({ message: 'Settings updated successfully', settings });
 });
 
+// DELETE /api/settings/reset-hours - delete all hours logs (admin only)
+router.delete('/reset-hours', authenticate, requireAdmin, (req, res) => {
+  db.exec('DELETE FROM hours_logs');
+  return res.json({ message: 'All hours data has been reset successfully' });
+});
+
+// DELETE /api/settings/reset-all - delete all workers and hours (keep admins only)
+router.delete('/reset-all', authenticate, requireAdmin, (req, res) => {
+  db.exec('DELETE FROM hours_logs');
+  db.exec('DELETE FROM admin_notes');
+  db.prepare("DELETE FROM users WHERE role = 'worker'").run();
+  return res.json({ message: 'All worker data and hours have been reset. Admin accounts remain.' });
+});
+
 module.exports = router;
