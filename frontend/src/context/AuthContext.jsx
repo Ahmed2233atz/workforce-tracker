@@ -46,8 +46,10 @@ export function AuthProvider({ children }) {
     window.location.href = '/login'
   }
 
+  const updateUser = (data) => setUser(prev => ({ ...prev, ...data }))
+
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, logout, updateUser }}>
       {children}
     </AuthContext.Provider>
   )

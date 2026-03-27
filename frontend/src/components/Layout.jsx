@@ -32,9 +32,71 @@ function getGreeting() {
   return 'Good evening'
 }
 
+function ProfileModal({ user, onClose, onSaved }) {
+  const [name, setName]         = useState(user?.name || '')
+  const [email, setEmail]       = useState(user?.email || '')
+  const [curPass, setCurPass]   = useState('')
+  const [newPass, setNewPass]   = useState('')
+  const [saving, setSaving]     = useState(false)
+  const [error, setError]       = useState('')
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    setError('')
+    setSaving(true)
+    try {
+      const payload = { name, email }
+      if (newPass) { payload.current_password = curPass; payload.new_password = newPass }
+      const res = await api.put('/auth/profile', payload)
+      onSaved(res.data)
+      onClose()
+    } catch (err) {
+      setError(err.response?.data?.error || 'Failed to save')
+    } finally { setSaving(false) }
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm" onClick={onClose}>
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 p-6" onClick={e => e.stopPropagation()}>
+        <div className="flex items-center justify-between mb-5">
+          <h3 className="text-lg font-semibold text-gray-900">Edit Profile</h3>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-xl">✕</button>
+        </div>
+
+        {error && <div className="mb-4 bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-2 text-sm">{error}</div>}
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Display Name</label>
+            <input className="input" value={name} onChange={e => setName(e.target.value)} placeholder="Your name" required />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+            <input type="email" className="input" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@one6.ai" />
+          </div>
+          <div className="border-t border-gray-100 pt-4">
+            <p className="text-xs text-gray-400 mb-3 font-medium uppercase tracking-wide">Change Password (optional)</p>
+            <div className="space-y-3">
+              <input type="password" className="input" value={curPass} onChange={e => setCurPass(e.target.value)} placeholder="Current password" />
+              <input type="password" className="input" value={newPass} onChange={e => setNewPass(e.target.value)} placeholder="New password (min 6 chars)" />
+            </div>
+          </div>
+          <div className="flex gap-3 pt-2">
+            <button type="button" onClick={onClose} className="btn-secondary flex-1">Cancel</button>
+            <button type="submit" disabled={saving} className="btn-primary flex-1">
+              {saving ? 'Saving...' : 'Save Changes'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  )
+}
+
 export default function Layout() {
-  const { user, logout } = useAuth()
-  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const { user, logout, updateUser } = useAuth()
+  const [sidebarOpen, setSidebarOpen]     = useState(false)
+  const [showProfile, setShowProfile]     = useState(false)
   const navItems = user?.role === 'admin' ? adminNav : workerNav
 
   const [unreadCount, setUnreadCount] = useState(0)
@@ -153,8 +215,12 @@ export default function Layout() {
           </div>
 
           <div className="flex items-center gap-3 ml-auto">
-            {/* User badge */}
-            <div className="hidden sm:flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-lg px-3 py-1.5">
+            {/* User badge — click to edit profile */}
+            <button
+              onClick={() => setShowProfile(true)}
+              className="hidden sm:flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-lg px-3 py-1.5 hover:bg-gray-100 transition-colors"
+              title="Edit profile"
+            >
               <div className="w-6 h-6 bg-primary-600 rounded-full flex items-center justify-center text-white text-xs font-bold">
                 {getInitials(user?.name)}
               </div>
@@ -162,7 +228,8 @@ export default function Layout() {
                 <span className="font-medium text-gray-700">{user?.name}</span>
                 <span className="ml-2 text-xs text-gray-400 capitalize">{user?.role}</span>
               </div>
-            </div>
+              <span className="text-gray-400 text-xs ml-1">✏️</span>
+            </button>
 
             {/* Notification bell (workers only) */}
             {user?.role === 'worker' && (
@@ -225,6 +292,15 @@ export default function Layout() {
 
       {/* Floating support chat — workers only */}
       {user?.role === 'worker' && <ChatWidget user={user} />}
+
+      {/* Profile edit modal */}
+      {showProfile && (
+        <ProfileModal
+          user={user}
+          onClose={() => setShowProfile(false)}
+          onSaved={(updated) => { updateUser(updated); import('react-hot-toast').then(m => m.default.success('Profile updated!')) }}
+        />
+      )}
     </div>
   )
 }
