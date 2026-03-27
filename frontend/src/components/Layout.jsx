@@ -114,6 +114,33 @@ export default function Layout() {
           ))}
         </nav>
 
+        {/* Resources (workers only) */}
+        {user?.role === 'worker' && (
+          <div className="px-3 py-4 border-t border-slate-700">
+            <p className="px-3 py-1 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
+              Resources
+            </p>
+            <a
+              href="https://drive.google.com/drive/folders/13rNNnZc9bGD9deYIB2Wg1Zb_cPw3SmUl?usp=drive_link"
+              target="_blank"
+              rel="noreferrer"
+              className="sidebar-link"
+            >
+              <span className="text-base">📁</span>
+              <span>Instructions Folder</span>
+            </a>
+            <a
+              href="https://forms.gle/skdqkaVm1b5uF2bcA"
+              target="_blank"
+              rel="noreferrer"
+              className="sidebar-link"
+            >
+              <span className="text-base">📝</span>
+              <span>Request Instructions</span>
+            </a>
+          </div>
+        )}
+
         {/* User section at bottom */}
         <div className="px-3 py-4 border-t border-slate-700">
           <div className="flex items-center gap-3 px-3 py-2 rounded-lg bg-slate-700/50">
