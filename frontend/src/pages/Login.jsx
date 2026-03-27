@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import { useAuth } from '../context/AuthContext.jsx'
+import Logo from '../components/Logo.jsx'
 
 export default function Login() {
   const { login } = useAuth()
@@ -40,8 +41,8 @@ export default function Login() {
       <div className="relative w-full max-w-md">
         {/* Logo / Branding */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-white/10 backdrop-blur-sm rounded-2xl mb-4 border border-white/20">
-            <span className="text-3xl">⏱️</span>
+          <div className="inline-flex items-center justify-center mb-4">
+            <Logo size={72} />
           </div>
           <h1 className="text-3xl font-bold text-white tracking-tight">One 6.AI</h1>
           <p className="mt-2 text-primary-200 text-sm">Employee hours management system</p>
