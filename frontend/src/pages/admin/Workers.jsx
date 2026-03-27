@@ -18,7 +18,7 @@ function Modal({ title, onClose, children }) {
   )
 }
 
-const departments = ['English Data Annotator', 'Russian Data Annotator', 'Egyptian English Data Annotator']
+const departments = ['English Data Annotator', 'Russian Data Annotator', 'Egyptian English Data Annotator', 'Chinese Data Annotator']
 
 function WorkerForm({ form, setForm, errors, submitting, onSubmit, onCancel, isEdit = false }) {
   return (

@@ -2,6 +2,7 @@ const projects = [
   { name: 'English Data Annotator', icon: '🇬🇧' },
   { name: 'Russian Data Annotator', icon: '🇷🇺' },
   { name: 'Egyptian English Data Annotator', icon: '🇪🇬' },
+  { name: 'Chinese Data Annotator', icon: '🇨🇳' },
 ]
 
 export default function Resources() {
@@ -39,6 +40,28 @@ export default function Resources() {
             </a>
           </div>
         ))}
+      </div>
+
+      {/* General Tips */}
+      <div className="space-y-4">
+        <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider">💡 Quality Tips</h2>
+        <div className="card flex items-center justify-between gap-4 hover:shadow-md transition-shadow border-l-4 border-l-yellow-400">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-yellow-50 border border-yellow-100 flex items-center justify-center text-2xl flex-shrink-0">⭐</div>
+            <div>
+              <p className="font-semibold text-gray-900">General Tips & Tricks to Achieve High Quality</p>
+              <p className="text-sm text-gray-400">Read this to improve your quality across all projects</p>
+            </div>
+          </div>
+          <a
+            href="https://docs.google.com/document/d/1ZmWJWd74nYvSqL9rni0rUDzpri521Sp89ag5BfzTt3w/edit?usp=sharing"
+            target="_blank"
+            rel="noreferrer"
+            className="btn-primary whitespace-nowrap flex-shrink-0"
+          >
+            📄 Open Document
+          </a>
+        </div>
       </div>
 
       {/* Request section */}
