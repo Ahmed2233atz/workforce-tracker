@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import {
@@ -194,20 +194,37 @@ export default function WorkerDashboard() {
   const [data, setData] = useState(null)
   const [leaderboard, setLeaderboard] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [notifications, setNotifications] = useState([])
+  const [unreadCount, setUnreadCount] = useState(0)
 
   const fetchData = async () => {
     try {
-      const [dRes, lRes] = await Promise.all([
+      const [dRes, lRes, nRes] = await Promise.all([
         api.get('/dashboard/worker'),
         api.get('/reports/leaderboard'),
+        api.get('/notifications'),
       ])
       setData(dRes.data)
       setLeaderboard(lRes.data)
+      setNotifications(nRes.data.notifications || [])
+      setUnreadCount(nRes.data.unread_count || 0)
     } catch {
       toast.error('Failed to load dashboard')
     } finally {
       setLoading(false)
     }
+  }
+
+  const markRead = async (id) => {
+    await api.put(`/notifications/${id}/read`)
+    setNotifications(prev => prev.map(n => n.id === id ? { ...n, is_read: 1 } : n))
+    setUnreadCount(prev => Math.max(0, prev - 1))
+  }
+
+  const markAllRead = async () => {
+    await api.put('/notifications/read-all')
+    setNotifications(prev => prev.map(n => ({ ...n, is_read: 1 })))
+    setUnreadCount(0)
   }
 
   useEffect(() => { fetchData() }, [])
@@ -243,6 +260,29 @@ export default function WorkerDashboard() {
         <h1 className="text-2xl font-bold text-gray-900">{greeting()}, {user?.name?.split(' ')[0]}! 👋</h1>
         <p className="text-gray-500 text-sm mt-0.5">{format(new Date(), 'EEEE, MMMM d, yyyy')}</p>
       </div>
+
+      {/* Notifications */}
+      {notifications.filter(n => !n.is_read).length > 0 && (
+        <div className="space-y-2">
+          {notifications.filter(n => !n.is_read).map(n => (
+            <div key={n.id} className="bg-blue-50 border border-blue-200 rounded-xl p-4 flex items-start justify-between gap-3">
+              <div className="flex items-start gap-3">
+                <span className="text-2xl mt-0.5">🔔</span>
+                <div>
+                  <p className="font-semibold text-blue-900 text-sm">{n.title}</p>
+                  <p className="text-blue-700 text-sm mt-0.5">{n.message}</p>
+                </div>
+              </div>
+              <button
+                onClick={() => markRead(n.id)}
+                className="text-xs bg-blue-600 text-white px-3 py-1.5 rounded-lg hover:bg-blue-700 whitespace-nowrap font-medium"
+              >
+                ✓ Confirm
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Today's progress */}
       <div className="card">
@@ -336,6 +376,42 @@ export default function WorkerDashboard() {
           color="green"
         />
       </div>
+
+      {/* Resources */}
+      <div className="card">
+        <h2 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+          <span>📚</span> Resources
+        </h2>
+        <div className="flex flex-wrap gap-3">
+          <a
+            href="https://drive.google.com/drive/folders/13rNNnZc9bGD9deYIB2Wg1Zb_cPw3SmUl?usp=drive_link"
+            target="_blank"
+            rel="noreferrer"
+            className="flex items-center gap-2 px-4 py-2.5 bg-blue-50 border border-blue-200 rounded-xl text-blue-700 font-medium text-sm hover:bg-blue-100 transition-colors"
+          >
+            <span>📁</span> Open Instructions Folder
+          </a>
+          <a
+            href="https://forms.gle/skdqkaVm1b5uF2bcA"
+            target="_blank"
+            rel="noreferrer"
+            className="flex items-center gap-2 px-4 py-2.5 bg-amber-50 border border-amber-200 rounded-xl text-amber-700 font-medium text-sm hover:bg-amber-100 transition-colors"
+          >
+            <span>📝</span> Request Instructions
+          </a>
+        </div>
+        <p className="text-xs text-gray-400 mt-2">Can't find instructions for your project? Click "Request Instructions" to submit a request.</p>
+      </div>
+
+      {/* Personal Instructions */}
+      {user?.instructions && (
+        <div className="card border-l-4 border-l-primary-500">
+          <h2 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
+            <span>📋</span> Your Instructions
+          </h2>
+          <p className="text-gray-700 text-sm whitespace-pre-wrap">{user.instructions}</p>
+        </div>
+      )}
 
       {/* Inline log form (only if not logged today) */}
       {!today && <LogHoursInline onSuccess={fetchData} />}

@@ -17,7 +17,7 @@ router.get('/', (req, res) => {
   const workers = db.prepare(`
     SELECT
       u.id, u.name, u.email, u.department, u.team, u.role, u.is_active,
-      u.created_at,
+      u.created_at, u.instructions,
       h.total_hours AS today_hours,
       h.start_time AS today_start,
       h.end_time AS today_end
@@ -40,7 +40,7 @@ router.get('/', (req, res) => {
 
 // POST /api/workers - create a new worker
 router.post('/', (req, res) => {
-  const { name, email, password, department, team, role } = req.body;
+  const { name, email, password, department, team, role, instructions } = req.body;
 
   if (!name || !email || !password) {
     return res.status(400).json({ error: 'Name, email, and password are required' });
@@ -55,11 +55,11 @@ router.post('/', (req, res) => {
   const workerRole = role === 'admin' ? 'admin' : 'worker';
 
   const result = db.prepare(`
-    INSERT INTO users (name, email, password_hash, role, department, team, is_active)
-    VALUES (?, ?, ?, ?, ?, ?, 1)
-  `).run(name.trim(), email.toLowerCase().trim(), password_hash, workerRole, department || null, team || null);
+    INSERT INTO users (name, email, password_hash, role, department, team, instructions, is_active)
+    VALUES (?, ?, ?, ?, ?, ?, ?, 1)
+  `).run(name.trim(), email.toLowerCase().trim(), password_hash, workerRole, department || null, team || null, instructions || null);
 
-  const newUser = db.prepare('SELECT id, name, email, role, department, team, is_active, created_at FROM users WHERE id = ?').get(result.lastInsertRowid);
+  const newUser = db.prepare('SELECT id, name, email, role, department, team, instructions, is_active, created_at FROM users WHERE id = ?').get(result.lastInsertRowid);
 
   return res.status(201).json(newUser);
 });
@@ -68,7 +68,7 @@ router.post('/', (req, res) => {
 router.get('/:id', (req, res) => {
   const { id } = req.params;
 
-  const worker = db.prepare('SELECT id, name, email, role, department, team, is_active, created_at FROM users WHERE id = ? AND role = ?').get(id, 'worker');
+  const worker = db.prepare('SELECT id, name, email, role, department, team, is_active, created_at, instructions FROM users WHERE id = ? AND role = ?').get(id, 'worker');
   if (!worker) {
     return res.status(404).json({ error: 'Worker not found' });
   }
@@ -105,7 +105,7 @@ router.get('/:id', (req, res) => {
 // PUT /api/workers/:id - update worker
 router.put('/:id', (req, res) => {
   const { id } = req.params;
-  const { name, email, department, team, is_active } = req.body;
+  const { name, email, department, team, is_active, instructions } = req.body;
 
   const worker = db.prepare('SELECT id FROM users WHERE id = ?').get(id);
   if (!worker) {
@@ -126,6 +126,7 @@ router.put('/:id', (req, res) => {
         department = COALESCE(?, department),
         team = COALESCE(?, team),
         is_active = COALESCE(?, is_active),
+        instructions = CASE WHEN ? IS NOT NULL THEN ? ELSE instructions END,
         updated_at = datetime('now')
     WHERE id = ?
   `).run(
@@ -134,10 +135,21 @@ router.put('/:id', (req, res) => {
     department !== undefined ? department : null,
     team !== undefined ? team : null,
     is_active !== undefined ? (is_active ? 1 : 0) : null,
+    instructions !== undefined ? instructions : null,
+    instructions !== undefined ? instructions : null,
     id
   );
 
-  const updated = db.prepare('SELECT id, name, email, role, department, team, is_active, created_at FROM users WHERE id = ?').get(id);
+  if (instructions && instructions.trim()) {
+    try {
+      db.prepare(`
+        INSERT INTO notifications (user_id, type, title, message)
+        VALUES (?, 'instructions', 'New Instructions Available', 'Your manager has added or updated your task instructions. Please review them.')
+      `).run(id);
+    } catch (e) {}
+  }
+
+  const updated = db.prepare('SELECT id, name, email, role, department, team, is_active, instructions, created_at FROM users WHERE id = ?').get(id);
   return res.json(updated);
 });
 

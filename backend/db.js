@@ -77,6 +77,26 @@ try {
   // Column already exists — safe to ignore
 }
 
+// Migration: add instructions column to users
+try {
+  db.exec('ALTER TABLE users ADD COLUMN instructions TEXT');
+} catch (e) {
+  // already exists
+}
+
+db.exec(`
+  CREATE TABLE IF NOT EXISTS notifications (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    type TEXT NOT NULL DEFAULT 'info',
+    title TEXT NOT NULL,
+    message TEXT NOT NULL,
+    is_read INTEGER NOT NULL DEFAULT 0,
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    FOREIGN KEY (user_id) REFERENCES users(id)
+  )
+`);
+
 // Insert default settings
 const defaultSettings = [
   ['daily_target_hours', '10'],

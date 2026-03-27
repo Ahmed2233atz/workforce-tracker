@@ -59,6 +59,7 @@ router.get('/me', authenticate, (req, res) => {
     timezone: req.user.timezone,
     is_active: req.user.is_active,
     created_at: req.user.created_at,
+    instructions: req.user.instructions,
   });
 });
 

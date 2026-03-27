@@ -70,6 +70,17 @@ function WorkerForm({ form, setForm, errors, submitting, onSubmit, onCancel, isE
             <input className="input" value={form.team} onChange={(e) => setForm({ ...form, team: e.target.value })} placeholder="e.g. Frontend" />
           </div>
         </div>
+        <div>
+          <label className="input-label">Instructions (optional)</label>
+          <textarea
+            className="input resize-none"
+            rows={3}
+            placeholder="Task instructions, guidelines, or notes for this worker..."
+            value={form.instructions}
+            onChange={(e) => setForm({ ...form, instructions: e.target.value })}
+          />
+          <p className="text-xs text-gray-400 mt-1">Workers will see this on their dashboard. A notification will be sent when updated.</p>
+        </div>
       </div>
       <div className="modal-footer">
         <button type="button" className="btn-secondary" onClick={onCancel}>
@@ -94,7 +105,7 @@ export default function Workers() {
   const [editWorker, setEditWorker] = useState(null)
   const [confirmDeactivate, setConfirmDeactivate] = useState(null)
   const [submitting, setSubmitting] = useState(false)
-  const [form, setForm] = useState({ name: '', email: '', password: '', department: '', team: '' })
+  const [form, setForm] = useState({ name: '', email: '', password: '', department: '', team: '', instructions: '' })
   const [errors, setErrors] = useState({})
 
   const fetchWorkers = async () => {
@@ -129,7 +140,7 @@ export default function Workers() {
       await api.post('/workers', form)
       toast.success('Worker added successfully')
       setShowAddModal(false)
-      setForm({ name: '', email: '', password: '', department: '', team: '' })
+      setForm({ name: '', email: '', password: '', department: '', team: '', instructions: '' })
       fetchWorkers()
     } catch (err) {
       toast.error(err.response?.data?.error || 'Failed to add worker')
@@ -148,6 +159,7 @@ export default function Workers() {
         email: form.email,
         department: form.department,
         team: form.team,
+        instructions: form.instructions,
       })
       toast.success('Worker updated successfully')
       setEditWorker(null)
@@ -177,7 +189,7 @@ export default function Workers() {
   }
 
   const openEdit = (w) => {
-    setForm({ name: w.name, email: w.email, password: '', department: w.department || '', team: w.team || '' })
+    setForm({ name: w.name, email: w.email, password: '', department: w.department || '', team: w.team || '', instructions: w.instructions || '' })
     setErrors({})
     setEditWorker(w)
   }
@@ -201,7 +213,7 @@ export default function Workers() {
           <h1 className="text-2xl font-bold text-gray-900">Workers</h1>
           <p className="text-gray-500 text-sm mt-0.5">{workers.filter(w => w.is_active).length} active workers</p>
         </div>
-        <button className="btn-primary" onClick={() => { setForm({ name: '', email: '', password: '', department: '', team: '' }); setErrors({}); setShowAddModal(true) }}>
+        <button className="btn-primary" onClick={() => { setForm({ name: '', email: '', password: '', department: '', team: '', instructions: '' }); setErrors({}); setShowAddModal(true) }}>
           + Add Worker
         </button>
       </div>

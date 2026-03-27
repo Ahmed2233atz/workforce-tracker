@@ -98,6 +98,7 @@ app.use('/api/dashboard', require('./routes/dashboard'));
 app.use('/api/reports', require('./routes/reports'));
 app.use('/api/settings', require('./routes/settings'));
 app.use('/api/leaderboard', require('./routes/leaderboard'));
+app.use('/api/notifications', require('./routes/notifications'));
 
 // Serve frontend static files in production
 const frontendDist = path.join(__dirname, 'public');
