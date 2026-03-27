@@ -65,6 +65,51 @@ export default function LoginInfo() {
         </div>
       </div>
 
+      {/* Multimango Platform */}
+      <div className="card border border-gray-200 space-y-4">
+        <div className="flex items-center justify-between gap-4 flex-wrap">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-xl bg-purple-50 border border-purple-100 flex items-center justify-center text-2xl flex-shrink-0">🌐</div>
+            <div>
+              <p className="font-bold text-gray-900 text-lg">Multimango</p>
+              <p className="text-sm text-gray-500">Task platform — where the work is done</p>
+            </div>
+          </div>
+          <a
+            href="https://www.multimango.com/tasks"
+            target="_blank"
+            rel="noreferrer"
+            className="btn-primary whitespace-nowrap flex-shrink-0"
+          >
+            🔗 Open Platform
+          </a>
+        </div>
+
+        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 space-y-3">
+          <p className="font-semibold text-blue-900 text-sm flex items-center gap-2">📋 Instructions</p>
+          <ul className="space-y-2.5 text-sm text-blue-800">
+            <li className="flex items-start gap-2">
+              <span className="mt-0.5 flex-shrink-0">▸</span>
+              <span>Before you start working, <strong>take the project name</strong> and go to the instructions file. Read the instructions carefully.</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="mt-0.5 flex-shrink-0">▸</span>
+              <span>Make sure the <strong>timer is off</strong> while reading instructions — reading is not paid.</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="mt-0.5 flex-shrink-0">▸</span>
+              <span>You will find more than one project on the platform. <strong>Only work on the ones you fully understand.</strong></span>
+            </li>
+          </ul>
+          <div className="bg-red-50 border border-red-200 rounded-lg p-3 mt-2">
+            <p className="text-red-700 text-sm font-semibold flex items-start gap-2">
+              <span className="flex-shrink-0">⚠️</span>
+              <span>If your quality is low in even <strong>one project</strong>, you will be removed from <strong>all projects</strong> — even if your quality is high in others.</span>
+            </p>
+          </div>
+        </div>
+      </div>
+
       {/* My Credentials */}
       <div className="space-y-3">
         <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider">🔑 My Login Credentials</h2>
