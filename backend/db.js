@@ -33,6 +33,7 @@ db.exec(`
     end_time TEXT,
     total_hours REAL NOT NULL,
     notes TEXT,
+    low_hours_reason TEXT,
     is_backfill INTEGER NOT NULL DEFAULT 0,
     backfill_approved INTEGER NOT NULL DEFAULT 0,
     approved_by INTEGER,
@@ -68,6 +69,13 @@ db.exec(`
     updated_at TEXT NOT NULL DEFAULT (datetime('now'))
   );
 `);
+
+// Migration: add low_hours_reason column if missing (for databases created before this field was added)
+try {
+  db.exec('ALTER TABLE hours_logs ADD COLUMN low_hours_reason TEXT');
+} catch (e) {
+  // Column already exists — safe to ignore
+}
 
 // Insert default settings
 const defaultSettings = [

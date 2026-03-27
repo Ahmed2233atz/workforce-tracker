@@ -10,13 +10,18 @@ import { useAuth } from '../../context/AuthContext.jsx'
 import StatCard from '../../components/StatCard.jsx'
 import api from '../../api/axios.js'
 
+const LOW_HOURS_THRESHOLD = 8
+
 function LogHoursInline({ onSuccess }) {
   const [form, setForm] = useState({
     date: new Date().toISOString().split('T')[0],
     start_time: '09:00',
     end_time: '19:00',
     notes: '',
+    manual_hours: '',
+    low_hours_reason: '',
   })
+  const [manualMode, setManualMode] = useState(false)
   const [submitting, setSubmitting] = useState(false)
 
   const calcHours = () => {
@@ -27,17 +32,29 @@ function LogHoursInline({ onSuccess }) {
     return diff > 0 ? parseFloat((diff / 60).toFixed(1)) : 0
   }
 
-  const total_hours = calcHours()
+  const effectiveHours = manualMode ? (parseFloat(form.manual_hours) || 0) : calcHours()
+  const needsReason = effectiveHours > 0 && effectiveHours < LOW_HOURS_THRESHOLD
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    if (total_hours <= 0) {
-      toast.error('End time must be after start time')
+    if (effectiveHours <= 0) {
+      toast.error(manualMode ? 'Please enter your hours' : 'End time must be after start time')
+      return
+    }
+    if (needsReason && !form.low_hours_reason.trim()) {
+      toast.error('Please explain why your hours are below 8h')
       return
     }
     setSubmitting(true)
     try {
-      await api.post('/hours', { ...form, total_hours })
+      await api.post('/hours', {
+        date: form.date,
+        start_time: manualMode ? null : form.start_time,
+        end_time: manualMode ? null : form.end_time,
+        total_hours: effectiveHours,
+        notes: form.notes,
+        low_hours_reason: needsReason ? form.low_hours_reason.trim() : '',
+      })
       toast.success('Hours logged successfully!')
       onSuccess()
     } catch (err) {
@@ -52,26 +69,94 @@ function LogHoursInline({ onSuccess }) {
       <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
         <span className="text-xl">⏱️</span> Log Today's Hours
       </h3>
-      <div className="grid grid-cols-2 gap-4 mb-4">
-        <div>
-          <label className="input-label">Start Time</label>
-          <input
-            type="time"
-            className="input"
-            value={form.start_time}
-            onChange={(e) => setForm({ ...form, start_time: e.target.value })}
-          />
-        </div>
-        <div>
-          <label className="input-label">End Time</label>
-          <input
-            type="time"
-            className="input"
-            value={form.end_time}
-            onChange={(e) => setForm({ ...form, end_time: e.target.value })}
-          />
-        </div>
+
+      {/* Mode toggle */}
+      <div className="flex rounded-xl overflow-hidden border border-gray-200 bg-gray-100 p-1 gap-1 mb-4">
+        <button
+          type="button"
+          onClick={() => setManualMode(false)}
+          className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-medium transition-all ${
+            !manualMode ? 'bg-white shadow text-primary-700 border border-primary-200' : 'text-gray-500 hover:text-gray-700'
+          }`}
+        >
+          ⏱ Start / End Time
+        </button>
+        <button
+          type="button"
+          onClick={() => setManualMode(true)}
+          className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-medium transition-all ${
+            manualMode ? 'bg-white shadow text-primary-700 border border-primary-200' : 'text-gray-500 hover:text-gray-700'
+          }`}
+        >
+          ✏️ Enter Hours Manually
+        </button>
       </div>
+
+      {/* Time pickers */}
+      {!manualMode && (
+        <div className="grid grid-cols-2 gap-4 mb-4">
+          <div>
+            <label className="input-label">Start Time</label>
+            <input
+              type="time"
+              className="input"
+              value={form.start_time}
+              onChange={(e) => setForm({ ...form, start_time: e.target.value })}
+            />
+          </div>
+          <div>
+            <label className="input-label">End Time</label>
+            <input
+              type="time"
+              className="input"
+              value={form.end_time}
+              onChange={(e) => setForm({ ...form, end_time: e.target.value })}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Manual hours input */}
+      {manualMode && (
+        <div className="mb-4 bg-white border border-primary-200 rounded-xl p-4">
+          <label className="input-label mb-2">How many hours did you work?</label>
+          <div className="flex items-center gap-3">
+            <input
+              type="number"
+              step="0.5"
+              min="0"
+              max="24"
+              className="input w-28 text-center text-2xl font-bold py-3"
+              value={form.manual_hours}
+              onChange={(e) => setForm({ ...form, manual_hours: e.target.value })}
+              placeholder="0"
+              autoFocus
+            />
+            <span className="text-gray-600 font-medium">hours</span>
+          </div>
+          <p className="text-xs text-gray-400 mt-1">e.g. 7.5 = 7 hours 30 minutes</p>
+        </div>
+      )}
+
+      {/* Low hours reason */}
+      {needsReason && (
+        <div className="mb-4 rounded-xl border-2 border-amber-400 bg-amber-50 p-3 space-y-2">
+          <div className="flex items-center gap-2">
+            <span className="text-amber-500">⚠️</span>
+            <label className="font-semibold text-amber-800 text-sm">
+              Reason for low hours — <span className="text-red-500">Required</span>
+            </label>
+          </div>
+          <textarea
+            required
+            className="input resize-none border-amber-300 focus:ring-amber-400 bg-white text-sm"
+            rows={2}
+            placeholder="e.g. Doctor's appointment, half-day leave…"
+            value={form.low_hours_reason}
+            onChange={(e) => setForm({ ...form, low_hours_reason: e.target.value })}
+          />
+        </div>
+      )}
 
       <div className="mb-4">
         <label className="input-label">Notes (optional)</label>
@@ -86,12 +171,16 @@ function LogHoursInline({ onSuccess }) {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span className="text-sm text-gray-500">Total:</span>
-          <span className={`text-xl font-bold ${total_hours >= 10 ? 'text-success-600' : total_hours >= 6 ? 'text-warning-600' : 'text-gray-600'}`}>
-            {total_hours}h
+          <span className={`text-xl font-bold ${effectiveHours >= 10 ? 'text-success-600' : effectiveHours >= 6 ? 'text-warning-600' : 'text-gray-600'}`}>
+            {effectiveHours}h
           </span>
-          {total_hours >= 10 && <span className="text-success-500">✓ On target!</span>}
+          {effectiveHours >= 10 && <span className="text-success-500 text-sm">✓ On target!</span>}
         </div>
-        <button type="submit" className="btn-primary" disabled={submitting || total_hours <= 0}>
+        <button
+          type="submit"
+          className="btn-primary"
+          disabled={submitting || effectiveHours <= 0 || (needsReason && !form.low_hours_reason.trim())}
+        >
           {submitting ? 'Logging...' : 'Log Hours'}
         </button>
       </div>
