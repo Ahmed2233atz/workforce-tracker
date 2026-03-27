@@ -1,7 +1,8 @@
 const express = require('express');
-const router = express.Router();
+const router = require('express').Router();
 const db = require('../db');
 const { authenticate, requireAdmin } = require('../middleware/auth');
+const { sendChatNotification } = require('../services/email');
 
 // Worker: GET /api/chat/messages — full conversation history
 router.get('/messages', authenticate, (req, res) => {
@@ -41,6 +42,11 @@ router.post('/messages', authenticate, (req, res) => {
     FROM chat_messages m JOIN users u ON u.id = m.sender_id
     WHERE m.id = ?
   `).get(result.lastInsertRowid);
+
+  // Send email notification to admin (non-blocking — won't break chat if email fails)
+  sendChatNotification(req.user.name, message.trim()).catch(e =>
+    console.error('[Chat] Email notification failed:', e.message)
+  );
 
   return res.status(201).json(msg);
 });

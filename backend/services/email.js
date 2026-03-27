@@ -161,4 +161,26 @@ const sendThresholdAlert = async (worker, hours) => {
   await sendMail(ADMIN_EMAIL, `Hours Alert: ${worker.name} logged ${hours}h`, html);
 };
 
-module.exports = { sendDailyReport, sendWeeklyReport, sendThresholdAlert };
+const sendChatNotification = async (workerName, message) => {
+  const html = `
+    <div style="font-family:sans-serif;max-width:500px;margin:0 auto;">
+      <div style="background:linear-gradient(135deg,#4f46e5,#7c3aed);padding:24px;border-radius:12px 12px 0 0;">
+        <h2 style="color:white;margin:0;font-size:18px">💬 New Support Message</h2>
+        <p style="color:rgba(255,255,255,0.8);margin:4px 0 0;font-size:13px;">One 6.AI — Workforce Tracker</p>
+      </div>
+      <div style="background:#f9fafb;padding:24px;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 12px 12px;">
+        <p style="margin:0 0 6px;font-size:13px;color:#6b7280;">Message from:</p>
+        <p style="margin:0 0 16px;font-size:16px;font-weight:600;color:#111827;">${workerName}</p>
+        <div style="background:white;border:1px solid #e5e7eb;border-radius:8px;padding:16px;">
+          <p style="margin:0;color:#374151;font-size:15px;line-height:1.6;">${message}</p>
+        </div>
+        <p style="margin:16px 0 0;font-size:12px;color:#9ca3af;">
+          Open the app → <strong>Support</strong> page to reply.
+        </p>
+      </div>
+    </div>
+  `;
+  await sendMail(ADMIN_EMAIL, `💬 Support message from ${workerName}`, html);
+};
+
+module.exports = { sendDailyReport, sendWeeklyReport, sendThresholdAlert, sendChatNotification };
