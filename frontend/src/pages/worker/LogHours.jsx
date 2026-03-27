@@ -205,70 +205,94 @@ export default function LogHours() {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-5">
-            {/* Time pickers */}
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="input-label">Start Time</label>
-                <input
-                  type="time"
-                  className="input text-lg py-3"
-                  value={form.start_time}
-                  onChange={(e) => setForm({ ...form, start_time: e.target.value })}
-                />
-              </div>
-              <div>
-                <label className="input-label">End Time</label>
-                <input
-                  type="time"
-                  className="input text-lg py-3"
-                  value={form.end_time}
-                  onChange={(e) => setForm({ ...form, end_time: e.target.value })}
-                />
-              </div>
+
+            {/* Mode toggle */}
+            <div className="flex rounded-xl overflow-hidden border border-gray-200 bg-gray-100 p-1 gap-1">
+              <button
+                type="button"
+                onClick={() => setManualHours(false)}
+                className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-medium transition-all ${
+                  !manualHours
+                    ? 'bg-white shadow text-primary-700 border border-primary-200'
+                    : 'text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                ⏱ Start / End Time
+              </button>
+              <button
+                type="button"
+                onClick={() => setManualHours(true)}
+                className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-medium transition-all ${
+                  manualHours
+                    ? 'bg-white shadow text-primary-700 border border-primary-200'
+                    : 'text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                ✏️ Enter Hours Manually
+              </button>
             </div>
 
-            {/* Total hours */}
-            <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-gray-700">Total Hours</span>
-                <label className="flex items-center gap-2 text-xs text-gray-500 cursor-pointer">
+            {/* Time pickers — shown only in time mode */}
+            {!manualHours && (
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="input-label">Start Time</label>
                   <input
-                    type="checkbox"
-                    checked={manualHours}
-                    onChange={(e) => setManualHours(e.target.checked)}
-                    className="rounded"
+                    type="time"
+                    className="input text-lg py-3"
+                    value={form.start_time}
+                    onChange={(e) => setForm({ ...form, start_time: e.target.value })}
                   />
-                  Manual override
-                </label>
+                </div>
+                <div>
+                  <label className="input-label">End Time</label>
+                  <input
+                    type="time"
+                    className="input text-lg py-3"
+                    value={form.end_time}
+                    onChange={(e) => setForm({ ...form, end_time: e.target.value })}
+                  />
+                </div>
               </div>
+            )}
 
-              {manualHours ? (
-                <div className="flex items-center gap-2">
+            {/* Manual hours input — shown only in manual mode */}
+            {manualHours && (
+              <div className="bg-primary-50 border border-primary-200 rounded-xl p-5">
+                <label className="input-label mb-2">How many hours did you work?</label>
+                <div className="flex items-center gap-3">
                   <input
                     type="number"
                     step="0.5"
                     min="0"
                     max="24"
-                    className="input w-24 text-center text-xl font-bold"
+                    className="input w-32 text-center text-2xl font-bold py-3"
                     value={form.total_hours}
                     onChange={(e) => setForm({ ...form, total_hours: e.target.value })}
                     placeholder="0"
+                    autoFocus
                   />
-                  <span className="text-gray-500">hours</span>
+                  <span className="text-gray-600 text-lg font-medium">hours</span>
                 </div>
-              ) : (
-                <div className="flex items-center gap-3">
-                  <span className={`text-3xl font-bold ${autoHours >= 10 ? 'text-success-600' : autoHours >= 6 ? 'text-warning-600' : 'text-gray-600'}`}>
-                    {autoHours}
-                  </span>
-                  <span className="text-gray-500">hours</span>
-                  {autoHours >= 10 && <span className="badge-done">✓ On target!</span>}
-                  {autoHours > 0 && autoHours < 10 && (
-                    <span className="text-xs text-gray-400">{(10 - autoHours).toFixed(1)}h to target</span>
-                  )}
-                </div>
-              )}
+                <p className="text-xs text-gray-400 mt-2">You can enter decimals, e.g. 7.5 for 7 hours 30 minutes</p>
+              </div>
+            )}
 
+            {/* Total hours summary */}
+            <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-medium text-gray-700">Total Hours</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <span className={`text-3xl font-bold ${effectiveHours >= 10 ? 'text-success-600' : effectiveHours >= 6 ? 'text-warning-600' : 'text-gray-600'}`}>
+                  {effectiveHours || 0}
+                </span>
+                <span className="text-gray-500">hours</span>
+                {effectiveHours >= 10 && <span className="badge-done">✓ On target!</span>}
+                {effectiveHours > 0 && effectiveHours < 10 && (
+                  <span className="text-xs text-gray-400">{(10 - effectiveHours).toFixed(1)}h to target</span>
+                )}
+              </div>
               <div className="mt-3 progress-bar">
                 <div
                   className={`progress-fill ${effectiveHours >= 10 ? 'bg-success-500' : effectiveHours >= 6 ? 'bg-warning-500' : 'bg-danger-400'}`}
