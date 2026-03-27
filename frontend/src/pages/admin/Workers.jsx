@@ -17,7 +17,7 @@ function Modal({ title, onClose, children }) {
   )
 }
 
-const departments = ['Engineering', 'Design', 'Marketing', 'DevOps', 'Management', 'Sales', 'HR', 'Finance']
+const departments = ['English Data Annotator', 'Russian Data Annotator', 'Egyptian English Data Annotator']
 
 export default function Workers() {
   const navigate = useNavigate()
