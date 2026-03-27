@@ -10,6 +10,7 @@ import Reports from './pages/admin/Reports.jsx'
 import Settings from './pages/admin/Settings.jsx'
 import WorkerDashboard from './pages/worker/Dashboard.jsx'
 import LogHours from './pages/worker/LogHours.jsx'
+import Resources from './pages/worker/Resources.jsx'
 
 export default function App() {
   return (
@@ -34,6 +35,7 @@ export default function App() {
             <Route element={<Layout />}>
               <Route path="/worker/dashboard" element={<WorkerDashboard />} />
               <Route path="/worker/log-hours" element={<LogHours />} />
+              <Route path="/worker/resources" element={<Resources />} />
             </Route>
           </Route>
 
