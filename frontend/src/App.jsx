@@ -8,6 +8,7 @@ import Workers from './pages/admin/Workers.jsx'
 import WorkerDetail from './pages/admin/WorkerDetail.jsx'
 import Reports from './pages/admin/Reports.jsx'
 import Settings from './pages/admin/Settings.jsx'
+import Support from './pages/admin/Support.jsx'
 import WorkerDashboard from './pages/worker/Dashboard.jsx'
 import LogHours from './pages/worker/LogHours.jsx'
 import Resources from './pages/worker/Resources.jsx'
@@ -27,6 +28,7 @@ export default function App() {
               <Route path="/admin/workers" element={<Workers />} />
               <Route path="/admin/workers/:id" element={<WorkerDetail />} />
               <Route path="/admin/reports" element={<Reports />} />
+              <Route path="/admin/support" element={<Support />} />
               <Route path="/admin/settings" element={<Settings />} />
             </Route>
           </Route>

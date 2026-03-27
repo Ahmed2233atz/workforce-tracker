@@ -3,12 +3,14 @@ import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext.jsx'
 import api from '../api/axios.js'
 import Logo from './Logo.jsx'
+import ChatWidget from './ChatWidget.jsx'
 
 const adminNav = [
   { to: '/admin/dashboard', icon: '📊', label: 'Dashboard' },
-  { to: '/admin/workers', icon: '👥', label: 'Workers' },
-  { to: '/admin/reports', icon: '📈', label: 'Reports' },
-  { to: '/admin/settings', icon: '⚙️', label: 'Settings' },
+  { to: '/admin/workers',   icon: '👥', label: 'Workers' },
+  { to: '/admin/reports',   icon: '📈', label: 'Reports' },
+  { to: '/admin/support',   icon: '💬', label: 'Support' },
+  { to: '/admin/settings',  icon: '⚙️', label: 'Settings' },
 ]
 
 const workerNav = [
@@ -220,6 +222,9 @@ export default function Layout() {
           <Outlet />
         </main>
       </div>
+
+      {/* Floating support chat — workers only */}
+      {user?.role === 'worker' && <ChatWidget user={user} />}
     </div>
   )
 }
