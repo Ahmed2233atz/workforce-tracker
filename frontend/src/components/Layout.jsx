@@ -79,10 +79,10 @@ export default function Layout() {
         {/* Logo */}
         <div className="flex items-center gap-3 px-6 py-5 border-b border-slate-700">
           <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-lg">
-            W
+            1
           </div>
           <div>
-            <span className="text-white font-bold text-base tracking-tight">WorkForce</span>
+            <span className="text-white font-bold text-base tracking-tight">One 6.AI</span>
             <span className="block text-slate-400 text-xs">
               {user?.role === 'admin' ? 'Admin Panel' : 'Employee Portal'}
             </span>

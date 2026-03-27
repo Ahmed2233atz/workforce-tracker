@@ -43,7 +43,7 @@ export default function Login() {
           <div className="inline-flex items-center justify-center w-16 h-16 bg-white/10 backdrop-blur-sm rounded-2xl mb-4 border border-white/20">
             <span className="text-3xl">⏱️</span>
           </div>
-          <h1 className="text-3xl font-bold text-white tracking-tight">WorkForce Tracker</h1>
+          <h1 className="text-3xl font-bold text-white tracking-tight">One 6.AI</h1>
           <p className="mt-2 text-primary-200 text-sm">Employee hours management system</p>
         </div>
 
@@ -98,7 +98,7 @@ export default function Login() {
         </div>
 
         <p className="text-center text-primary-400 text-xs mt-6">
-          WorkForce Tracker v1.0 — Internal use only
+          One 6.AI — Internal use only
         </p>
       </div>
     </div>
