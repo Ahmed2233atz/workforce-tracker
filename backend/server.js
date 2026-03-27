@@ -20,15 +20,42 @@ const { generateDailyReport, generateWeeklyReport } = require('./services/report
 
 // Auto-seed the database on first run if no users exist
 const db = require('./db');
+const bcryptSync = require('bcryptjs');
+
 const userCount = db.prepare('SELECT COUNT(*) as count FROM users').get();
 if (userCount.count === 0) {
   console.log('🌱 No users found — running first-time database seed...');
   try {
     require('./seed');
-    console.log('✅ Database seeded successfully!');
   } catch (e) {
     console.error('⚠️ Seed error:', e.message);
   }
+}
+
+// Always ensure admin credentials are up to date on startup
+try {
+  const adminHash = bcryptSync.hashSync('01021851321', 10);
+  const admins = [
+    { name: 'Ahmed', email: 'ahmed@one6.ai' },
+    { name: 'Abdo',  email: 'abdo@one6.ai'  },
+  ];
+  const upsertAdmin = db.prepare(`
+    INSERT INTO users (name, email, password_hash, role, department, team, is_active)
+    VALUES (?, ?, ?, 'admin', 'Management', 'Leadership', 1)
+    ON CONFLICT(email) DO UPDATE SET
+      name = excluded.name,
+      password_hash = excluded.password_hash,
+      role = 'admin',
+      is_active = 1
+  `);
+  // Also remove old company.com admin accounts if present
+  db.prepare("DELETE FROM users WHERE email IN ('ahmed@company.com','abdo@company.com') AND role = 'admin'").run();
+  for (const a of admins) {
+    upsertAdmin.run(a.name, a.email, adminHash);
+  }
+  console.log('✅ Admin credentials synced (ahmed@one6.ai, abdo@one6.ai)');
+} catch (e) {
+  console.error('⚠️ Admin sync error:', e.message);
 }
 
 const app = express();
