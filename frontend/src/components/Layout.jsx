@@ -35,6 +35,7 @@ export default function Layout() {
   const [unreadCount, setUnreadCount] = useState(0)
   const [showNotifs, setShowNotifs] = useState(false)
   const [notifications, setNotifications] = useState([])
+  const [resourcesOpen, setResourcesOpen] = useState(false)
 
   useEffect(() => {
     if (user?.role !== 'worker') return
@@ -117,27 +118,35 @@ export default function Layout() {
         {/* Resources (workers only) */}
         {user?.role === 'worker' && (
           <div className="px-3 py-4 border-t border-slate-700">
-            <p className="px-3 py-1 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
-              Resources
-            </p>
-            <a
-              href="https://drive.google.com/drive/folders/13rNNnZc9bGD9deYIB2Wg1Zb_cPw3SmUl?usp=drive_link"
-              target="_blank"
-              rel="noreferrer"
-              className="sidebar-link"
+            <button
+              onClick={() => setResourcesOpen(!resourcesOpen)}
+              className="w-full flex items-center justify-between px-3 py-1 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1 hover:text-slate-300 transition-colors"
             >
-              <span className="text-base">📁</span>
-              <span>Instructions Folder</span>
-            </a>
-            <a
-              href="https://forms.gle/skdqkaVm1b5uF2bcA"
-              target="_blank"
-              rel="noreferrer"
-              className="sidebar-link"
-            >
-              <span className="text-base">📝</span>
-              <span>Request Instructions</span>
-            </a>
+              <span>Resources</span>
+              <span className={`transition-transform duration-200 ${resourcesOpen ? 'rotate-180' : ''}`}>▾</span>
+            </button>
+            {resourcesOpen && (
+              <div className="space-y-1">
+                <a
+                  href="https://drive.google.com/drive/folders/13rNNnZc9bGD9deYIB2Wg1Zb_cPw3SmUl?usp=drive_link"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="sidebar-link"
+                >
+                  <span className="text-base">📁</span>
+                  <span>Instructions Folder</span>
+                </a>
+                <a
+                  href="https://forms.gle/skdqkaVm1b5uF2bcA"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="sidebar-link"
+                >
+                  <span className="text-base">📝</span>
+                  <span>Request Instructions</span>
+                </a>
+              </div>
+            )}
           </div>
         )}
 
