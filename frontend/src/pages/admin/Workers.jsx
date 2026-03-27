@@ -19,6 +19,70 @@ function Modal({ title, onClose, children }) {
 
 const departments = ['English Data Annotator', 'Russian Data Annotator', 'Egyptian English Data Annotator']
 
+function WorkerForm({ form, setForm, errors, submitting, onSubmit, onCancel, isEdit = false }) {
+  return (
+    <form onSubmit={onSubmit}>
+      <div className="modal-body space-y-4">
+        <div>
+          <label className="input-label">Full Name *</label>
+          <input
+            className={`input ${errors.name ? 'border-danger-400 focus:ring-danger-400' : ''}`}
+            value={form.name}
+            onChange={(e) => setForm({ ...form, name: e.target.value })}
+            placeholder="e.g. Jane Smith"
+          />
+          {errors.name && <p className="text-danger-600 text-xs mt-1">{errors.name}</p>}
+        </div>
+        <div>
+          <label className="input-label">Email Address *</label>
+          <input
+            type="email"
+            className={`input ${errors.email ? 'border-danger-400 focus:ring-danger-400' : ''}`}
+            value={form.email}
+            onChange={(e) => setForm({ ...form, email: e.target.value })}
+            placeholder="jane@company.com"
+          />
+          {errors.email && <p className="text-danger-600 text-xs mt-1">{errors.email}</p>}
+        </div>
+        {!isEdit && (
+          <div>
+            <label className="input-label">Password *</label>
+            <input
+              type="password"
+              className={`input ${errors.password ? 'border-danger-400 focus:ring-danger-400' : ''}`}
+              value={form.password}
+              onChange={(e) => setForm({ ...form, password: e.target.value })}
+              placeholder="Minimum 6 characters"
+            />
+            {errors.password && <p className="text-danger-600 text-xs mt-1">{errors.password}</p>}
+          </div>
+        )}
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="input-label">Department</label>
+            <select className="input" value={form.department} onChange={(e) => setForm({ ...form, department: e.target.value })}>
+              <option value="">Select...</option>
+              {departments.map((d) => <option key={d} value={d}>{d}</option>)}
+            </select>
+          </div>
+          <div>
+            <label className="input-label">Team</label>
+            <input className="input" value={form.team} onChange={(e) => setForm({ ...form, team: e.target.value })} placeholder="e.g. Frontend" />
+          </div>
+        </div>
+      </div>
+      <div className="modal-footer">
+        <button type="button" className="btn-secondary" onClick={onCancel}>
+          Cancel
+        </button>
+        <button type="submit" className="btn-primary" disabled={submitting}>
+          {submitting ? 'Saving...' : isEdit ? 'Save Changes' : 'Add Worker'}
+        </button>
+      </div>
+    </form>
+  )
+}
+
 export default function Workers() {
   const navigate = useNavigate()
   const [workers, setWorkers] = useState([])
@@ -128,68 +192,6 @@ export default function Workers() {
     const matchActive = showInactive ? true : w.is_active
     return matchSearch && matchDept && matchActive
   })
-
-  const WorkerForm = ({ onSubmit, isEdit = false }) => (
-    <form onSubmit={onSubmit}>
-      <div className="modal-body space-y-4">
-        <div>
-          <label className="input-label">Full Name *</label>
-          <input
-            className={`input ${errors.name ? 'border-danger-400 focus:ring-danger-400' : ''}`}
-            value={form.name}
-            onChange={(e) => setForm({ ...form, name: e.target.value })}
-            placeholder="e.g. Jane Smith"
-          />
-          {errors.name && <p className="text-danger-600 text-xs mt-1">{errors.name}</p>}
-        </div>
-        <div>
-          <label className="input-label">Email Address *</label>
-          <input
-            type="email"
-            className={`input ${errors.email ? 'border-danger-400 focus:ring-danger-400' : ''}`}
-            value={form.email}
-            onChange={(e) => setForm({ ...form, email: e.target.value })}
-            placeholder="jane@company.com"
-          />
-          {errors.email && <p className="text-danger-600 text-xs mt-1">{errors.email}</p>}
-        </div>
-        {!isEdit && (
-          <div>
-            <label className="input-label">Password *</label>
-            <input
-              type="password"
-              className={`input ${errors.password ? 'border-danger-400 focus:ring-danger-400' : ''}`}
-              value={form.password}
-              onChange={(e) => setForm({ ...form, password: e.target.value })}
-              placeholder="Minimum 6 characters"
-            />
-            {errors.password && <p className="text-danger-600 text-xs mt-1">{errors.password}</p>}
-          </div>
-        )}
-        <div className="grid grid-cols-2 gap-3">
-          <div>
-            <label className="input-label">Department</label>
-            <select className="input" value={form.department} onChange={(e) => setForm({ ...form, department: e.target.value })}>
-              <option value="">Select...</option>
-              {departments.map((d) => <option key={d} value={d}>{d}</option>)}
-            </select>
-          </div>
-          <div>
-            <label className="input-label">Team</label>
-            <input className="input" value={form.team} onChange={(e) => setForm({ ...form, team: e.target.value })} placeholder="e.g. Frontend" />
-          </div>
-        </div>
-      </div>
-      <div className="modal-footer">
-        <button type="button" className="btn-secondary" onClick={() => isEdit ? setEditWorker(null) : setShowAddModal(false)}>
-          Cancel
-        </button>
-        <button type="submit" className="btn-primary" disabled={submitting}>
-          {submitting ? 'Saving...' : isEdit ? 'Save Changes' : 'Add Worker'}
-        </button>
-      </div>
-    </form>
-  )
 
   return (
     <div className="space-y-6 fade-in">
@@ -324,14 +326,22 @@ export default function Workers() {
       {/* Add Modal */}
       {showAddModal && (
         <Modal title="Add New Worker" onClose={() => setShowAddModal(false)}>
-          <WorkerForm onSubmit={handleAdd} />
+          <WorkerForm
+            form={form} setForm={setForm} errors={errors}
+            submitting={submitting} onSubmit={handleAdd}
+            onCancel={() => setShowAddModal(false)}
+          />
         </Modal>
       )}
 
       {/* Edit Modal */}
       {editWorker && (
         <Modal title={`Edit: ${editWorker.name}`} onClose={() => setEditWorker(null)}>
-          <WorkerForm onSubmit={handleEdit} isEdit />
+          <WorkerForm
+            form={form} setForm={setForm} errors={errors}
+            submitting={submitting} onSubmit={handleEdit}
+            onCancel={() => setEditWorker(null)} isEdit
+          />
         </Modal>
       )}
 
