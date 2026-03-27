@@ -100,6 +100,7 @@ app.use('/api/settings', require('./routes/settings'));
 app.use('/api/leaderboard', require('./routes/leaderboard'));
 app.use('/api/notifications', require('./routes/notifications'));
 app.use('/api/chat', require('./routes/chat'));
+app.use('/api/avatars', require('./routes/avatars'));
 app.use('/api/workers/:id/credentials', require('./routes/credentials'));
 app.get('/api/me/credentials', require('./middleware/auth').authenticate, (req, res) => {
   const db = require('./db');

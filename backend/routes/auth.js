@@ -60,6 +60,7 @@ router.get('/me', authenticate, (req, res) => {
     is_active: req.user.is_active,
     created_at: req.user.created_at,
     instructions: req.user.instructions,
+    avatar_url: req.user.avatar_url,
   });
 });
 

@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import api from '../../api/axios.js'
+import Avatar from '../../components/Avatar.jsx'
 
 function Modal({ title, onClose, children }) {
   return (
@@ -285,9 +286,7 @@ export default function Workers() {
                   <tr key={w.id} className={!w.is_active ? 'opacity-60' : ''}>
                     <td>
                       <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate(`/admin/workers/${w.id}`)}>
-                        <div className="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center text-primary-700 text-xs font-bold flex-shrink-0">
-                          {w.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
-                        </div>
+                        <Avatar name={w.name} avatarUrl={w.avatar_url} size={32} />
                         <span className="font-medium text-gray-900 hover:text-primary-600">{w.name}</span>
                       </div>
                     </td>

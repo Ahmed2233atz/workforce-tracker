@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import {
@@ -8,8 +8,38 @@ import {
 import { format, parseISO } from 'date-fns'
 import api from '../../api/axios.js'
 import StatCard from '../../components/StatCard.jsx'
+import Avatar from '../../components/Avatar.jsx'
 
 const TABS = ['Hours History', 'Credentials', 'Notes & Warnings', 'Pending Backfills']
+
+function WorkerAvatarUpload({ worker, onUploaded }) {
+  const fileRef = useRef()
+  const [uploading, setUploading] = useState(false)
+
+  const handleFile = async (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setUploading(true)
+    try {
+      const form = new FormData()
+      form.append('avatar', file)
+      const res = await api.post(`/avatars/worker/${worker.id}`, form, { headers: { 'Content-Type': 'multipart/form-data' } })
+      onUploaded(res.data.avatar_url)
+      toast.success('Photo updated!')
+    } catch { toast.error('Upload failed') }
+    finally { setUploading(false) }
+  }
+
+  return (
+    <div className="relative cursor-pointer group flex-shrink-0" onClick={() => fileRef.current?.click()} title="Click to change photo">
+      <Avatar name={worker.name} avatarUrl={worker.avatar_url} size={64} className="rounded-2xl" />
+      <div className="absolute inset-0 rounded-2xl bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+        <span className="text-white text-sm">{uploading ? '⏳' : '📷'}</span>
+      </div>
+      <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleFile} />
+    </div>
+  )
+}
 
 export default function WorkerDetail() {
   const { id } = useParams()
@@ -165,9 +195,7 @@ export default function WorkerDetail() {
 
         <div className="card">
           <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-            <div className="w-16 h-16 bg-primary-100 rounded-2xl flex items-center justify-center text-primary-700 text-2xl font-bold flex-shrink-0">
-              {worker.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
-            </div>
+            <WorkerAvatarUpload worker={worker} onUploaded={(url) => setWorker(w => ({ ...w, avatar_url: url }))} />
             <div className="flex-1">
               <div className="flex items-center gap-3 flex-wrap">
                 <h1 className="text-2xl font-bold text-gray-900">{worker.name}</h1>

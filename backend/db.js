@@ -77,6 +77,11 @@ try {
   // Column already exists — safe to ignore
 }
 
+// Migration: add avatar_url column to users
+try {
+  db.exec('ALTER TABLE users ADD COLUMN avatar_url TEXT');
+} catch (e) { /* already exists */ }
+
 // Migration: add instructions column to users
 try {
   db.exec('ALTER TABLE users ADD COLUMN instructions TEXT');

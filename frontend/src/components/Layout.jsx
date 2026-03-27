@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext.jsx'
 import api from '../api/axios.js'
 import Logo from './Logo.jsx'
 import ChatWidget from './ChatWidget.jsx'
+import Avatar from './Avatar.jsx'
 
 const adminNav = [
   { to: '/admin/dashboard', icon: '📊', label: 'Dashboard' },
@@ -32,13 +33,34 @@ function getGreeting() {
   return 'Good evening'
 }
 
-function ProfileModal({ user, onClose, onSaved }) {
+function ProfileModal({ user, onClose, onSaved, onAvatarChange }) {
   const [name, setName]         = useState(user?.name || '')
   const [email, setEmail]       = useState(user?.email || '')
   const [curPass, setCurPass]   = useState('')
   const [newPass, setNewPass]   = useState('')
   const [saving, setSaving]     = useState(false)
+  const [uploading, setUploading] = useState(false)
+  const [preview, setPreview]   = useState(user?.avatar_url || null)
   const [error, setError]       = useState('')
+  const fileRef = useRef()
+
+  const handleAvatarClick = () => fileRef.current?.click()
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    // Local preview
+    setPreview(URL.createObjectURL(file))
+    setUploading(true)
+    try {
+      const form = new FormData()
+      form.append('avatar', file)
+      const res = await api.post('/avatars/me', form, { headers: { 'Content-Type': 'multipart/form-data' } })
+      onAvatarChange(res.data.avatar_url)
+    } catch {
+      setError('Failed to upload photo')
+    } finally { setUploading(false) }
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -61,6 +83,23 @@ function ProfileModal({ user, onClose, onSaved }) {
         <div className="flex items-center justify-between mb-5">
           <h3 className="text-lg font-semibold text-gray-900">Edit Profile</h3>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-xl">✕</button>
+        </div>
+
+        {/* Avatar upload */}
+        <div className="flex flex-col items-center mb-5">
+          <div className="relative cursor-pointer group" onClick={handleAvatarClick}>
+            {preview
+              ? <img src={preview} alt="avatar" className="w-20 h-20 rounded-full object-cover border-4 border-primary-100" />
+              : <div className="w-20 h-20 rounded-full bg-primary-600 flex items-center justify-center text-white text-2xl font-bold border-4 border-primary-100">
+                  {(user?.name || '?').split(' ').map(n => n[0]).join('').toUpperCase().slice(0,2)}
+                </div>
+            }
+            <div className="absolute inset-0 rounded-full bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+              <span className="text-white text-xs font-medium">{uploading ? '⏳' : '📷'}</span>
+            </div>
+          </div>
+          <p className="text-xs text-gray-400 mt-2">Click photo to change</p>
+          <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
         </div>
 
         {error && <div className="mb-4 bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-2 text-sm">{error}</div>}
@@ -221,9 +260,7 @@ export default function Layout() {
               className="hidden sm:flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-lg px-3 py-1.5 hover:bg-gray-100 transition-colors"
               title="Edit profile"
             >
-              <div className="w-6 h-6 bg-primary-600 rounded-full flex items-center justify-center text-white text-xs font-bold">
-                {getInitials(user?.name)}
-              </div>
+              <Avatar name={user?.name} avatarUrl={user?.avatar_url} size={24} />
               <div className="text-sm">
                 <span className="font-medium text-gray-700">{user?.name}</span>
                 <span className="ml-2 text-xs text-gray-400 capitalize">{user?.role}</span>
@@ -299,6 +336,7 @@ export default function Layout() {
           user={user}
           onClose={() => setShowProfile(false)}
           onSaved={(updated) => { updateUser(updated); import('react-hot-toast').then(m => m.default.success('Profile updated!')) }}
+          onAvatarChange={(url) => updateUser({ avatar_url: url })}
         />
       )}
     </div>
