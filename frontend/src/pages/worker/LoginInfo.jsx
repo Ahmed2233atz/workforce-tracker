@@ -100,6 +100,10 @@ export default function LoginInfo() {
               <span className="mt-0.5 flex-shrink-0">▸</span>
               <span>You will find more than one project on the platform. <strong>Only work on the ones you fully understand.</strong></span>
             </li>
+            <li className="flex items-start gap-2">
+              <span className="mt-0.5 flex-shrink-0">▸</span>
+              <span>Multimango must be opened using <strong>Google Chrome only</strong> — no other browser is allowed.</span>
+            </li>
           </ul>
           <div className="bg-red-50 border border-red-200 rounded-lg p-3 mt-2">
             <p className="text-red-700 text-sm font-semibold flex items-start gap-2">
