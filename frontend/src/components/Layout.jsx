@@ -36,6 +36,9 @@ export default function Layout() {
   const [unreadCount, setUnreadCount] = useState(0)
   const [showNotifs, setShowNotifs] = useState(false)
   const [notifications, setNotifications] = useState([])
+  const [credentials, setCredentials] = useState([])
+  const [showCreds, setShowCreds] = useState(false)
+  const [showPasswords, setShowPasswords] = useState({})
 
   useEffect(() => {
     if (user?.role !== 'worker') return
@@ -46,7 +49,14 @@ export default function Layout() {
         setNotifications(res.data.notifications || [])
       } catch {}
     }
+    const fetchCreds = async () => {
+      try {
+        const res = await api.get('/me/credentials')
+        setCredentials(res.data || [])
+      } catch {}
+    }
     fetchNotifs()
+    fetchCreds()
     const interval = setInterval(fetchNotifs, 60000)
     return () => clearInterval(interval)
   }, [user])
@@ -115,7 +125,53 @@ export default function Layout() {
           ))}
         </nav>
 
-{/* User section at bottom */}
+        {/* Credentials (workers only) */}
+        {user?.role === 'worker' && (
+          <div className="px-3 pb-2 border-t border-slate-700 pt-3">
+            <button
+              onClick={() => setShowCreds(!showCreds)}
+              className="w-full flex items-center justify-between px-3 py-2 rounded-lg hover:bg-slate-700/50 transition-colors text-left"
+            >
+              <span className="text-slate-300 text-sm font-medium">🔐 My Login Credentials</span>
+              <span className={`text-slate-400 text-xs transition-transform duration-200 ${showCreds ? 'rotate-180' : ''}`}>▾</span>
+            </button>
+            {showCreds && (
+              <div className="mt-1 space-y-2 px-2">
+                {credentials.length === 0 ? (
+                  <p className="text-slate-500 text-xs px-1 py-2">No credentials added yet.</p>
+                ) : (
+                  credentials.map(cred => (
+                    <div key={cred.id} className="bg-slate-700/50 rounded-lg p-3 space-y-1.5">
+                      <p className="text-white text-xs font-semibold">{cred.platform}</p>
+                      {cred.username && (
+                        <div className="text-xs">
+                          <span className="text-slate-400">User: </span>
+                          <span className="text-slate-200 font-mono">{cred.username}</span>
+                        </div>
+                      )}
+                      {cred.password && (
+                        <div className="text-xs flex items-center gap-1.5">
+                          <span className="text-slate-400">Pass: </span>
+                          <span className="text-slate-200 font-mono">
+                            {showPasswords[cred.id] ? cred.password : '••••••'}
+                          </span>
+                          <button
+                            onClick={() => setShowPasswords(p => ({ ...p, [cred.id]: !p[cred.id] }))}
+                            className="text-primary-400 hover:text-primary-300 text-xs underline ml-1"
+                          >
+                            {showPasswords[cred.id] ? 'Hide' : 'Show'}
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  ))
+                )}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* User section at bottom */}
         <div className="px-3 py-4 border-t border-slate-700">
           <div className="flex items-center gap-3 px-3 py-2 rounded-lg bg-slate-700/50">
             <div className="w-8 h-8 bg-primary-600 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
