@@ -83,6 +83,18 @@ router.post('/worker/:id', authenticate, requireAdmin, (req, res, next) => {
   return res.json({ avatar_url: avatarUrl });
 });
 
+// ── Admin: delete a worker's avatar ──────────────────────────────────────────
+router.delete('/worker/:id', authenticate, requireAdmin, (req, res) => {
+  const { id } = req.params;
+  const row = db.prepare('SELECT avatar_url FROM users WHERE id = ?').get(id);
+  if (row?.avatar_url) {
+    const file = path.join(avatarDir, path.basename(row.avatar_url));
+    if (fs.existsSync(file)) fs.unlinkSync(file);
+  }
+  db.prepare("UPDATE users SET avatar_url = NULL, updated_at = datetime('now') WHERE id = ?").run(id);
+  return res.json({ message: 'Avatar removed' });
+});
+
 // ── Delete own avatar ─────────────────────────────────────────────────────────
 router.delete('/me', authenticate, (req, res) => {
   const row = db.prepare('SELECT avatar_url FROM users WHERE id = ?').get(req.user.id);

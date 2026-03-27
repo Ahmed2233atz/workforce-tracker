@@ -49,7 +49,6 @@ function ProfileModal({ user, onClose, onSaved, onAvatarChange }) {
   const handleFileChange = async (e) => {
     const file = e.target.files?.[0]
     if (!file) return
-    // Local preview
     setPreview(URL.createObjectURL(file))
     setUploading(true)
     try {
@@ -59,6 +58,17 @@ function ProfileModal({ user, onClose, onSaved, onAvatarChange }) {
       onAvatarChange(res.data.avatar_url)
     } catch {
       setError('Failed to upload photo')
+    } finally { setUploading(false) }
+  }
+
+  const handleDeleteAvatar = async () => {
+    setUploading(true)
+    try {
+      await api.delete('/avatars/me')
+      setPreview(null)
+      onAvatarChange(null)
+    } catch {
+      setError('Failed to remove photo')
     } finally { setUploading(false) }
   }
 
@@ -98,7 +108,19 @@ function ProfileModal({ user, onClose, onSaved, onAvatarChange }) {
               <span className="text-white text-xs font-medium">{uploading ? '⏳' : '📷'}</span>
             </div>
           </div>
-          <p className="text-xs text-gray-400 mt-2">Click photo to change</p>
+          <div className="flex items-center gap-3 mt-2">
+            <p className="text-xs text-gray-400">Click photo to change</p>
+            {preview && (
+              <button
+                type="button"
+                onClick={handleDeleteAvatar}
+                disabled={uploading}
+                className="text-xs text-red-500 hover:text-red-700 font-medium disabled:opacity-50"
+              >
+                🗑 Remove
+              </button>
+            )}
+          </div>
           <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
         </div>
 

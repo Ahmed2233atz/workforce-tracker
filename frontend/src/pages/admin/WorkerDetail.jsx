@@ -30,12 +30,35 @@ function WorkerAvatarUpload({ worker, onUploaded }) {
     finally { setUploading(false) }
   }
 
+  const handleDelete = async (e) => {
+    e.stopPropagation()
+    setUploading(true)
+    try {
+      await api.delete(`/avatars/worker/${worker.id}`)
+      onUploaded(null)
+      toast.success('Photo removed')
+    } catch { toast.error('Failed to remove photo') }
+    finally { setUploading(false) }
+  }
+
   return (
-    <div className="relative cursor-pointer group flex-shrink-0" onClick={() => fileRef.current?.click()} title="Click to change photo">
-      <Avatar name={worker.name} avatarUrl={worker.avatar_url} size={64} className="rounded-2xl" />
-      <div className="absolute inset-0 rounded-2xl bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-        <span className="text-white text-sm">{uploading ? '⏳' : '📷'}</span>
+    <div className="flex flex-col items-center gap-1 flex-shrink-0">
+      <div className="relative cursor-pointer group" onClick={() => fileRef.current?.click()} title="Click to change photo">
+        <Avatar name={worker.name} avatarUrl={worker.avatar_url} size={64} className="rounded-2xl" />
+        <div className="absolute inset-0 rounded-2xl bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+          <span className="text-white text-sm">{uploading ? '⏳' : '📷'}</span>
+        </div>
       </div>
+      {worker.avatar_url && (
+        <button
+          type="button"
+          onClick={handleDelete}
+          disabled={uploading}
+          className="text-xs text-red-500 hover:text-red-700 font-medium disabled:opacity-50"
+        >
+          🗑 Remove
+        </button>
+      )}
       <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleFile} />
     </div>
   )
