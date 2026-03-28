@@ -35,10 +35,6 @@ if (userCount.count === 0) {
 // Always ensure admin credentials are up to date on startup
 try {
   const adminHash = bcryptSync.hashSync('01021851321', 10);
-  const admins = [
-    { name: 'Ahmed', email: 'ahmed@one6.ai' },
-    { name: 'Abdo',  email: 'abdo@one6.ai'  },
-  ];
   const upsertAdmin = db.prepare(`
     INSERT INTO users (name, email, password_hash, role, department, team, is_active)
     VALUES (?, ?, ?, 'admin', 'Management', 'Leadership', 1)
@@ -48,12 +44,10 @@ try {
       role = 'admin',
       is_active = 1
   `);
-  // Also remove old company.com admin accounts if present
-  db.prepare("DELETE FROM users WHERE email IN ('ahmed@company.com','abdo@company.com') AND role = 'admin'").run();
-  for (const a of admins) {
-    upsertAdmin.run(a.name, a.email, adminHash);
-  }
-  console.log('✅ Admin credentials synced (ahmed@one6.ai, abdo@one6.ai)');
+  // Remove old/unused admin accounts
+  db.prepare("DELETE FROM users WHERE email IN ('ahmed@company.com','abdo@company.com','abdo@one6.ai') AND role = 'admin'").run();
+  upsertAdmin.run('Ahmed', 'ahmed@one6.ai', adminHash);
+  console.log('✅ Admin credentials synced (ahmed@one6.ai)');
 } catch (e) {
   console.error('⚠️ Admin sync error:', e.message);
 }

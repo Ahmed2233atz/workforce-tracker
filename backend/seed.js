@@ -17,8 +17,6 @@ const insertUser = db.prepare(`
 `);
 
 insertUser.run('Ahmed', 'ahmed@one6.ai', adminHash, 'admin', 'Management', 'Leadership');
-insertUser.run('Abdo', 'abdo@one6.ai', adminHash, 'admin', 'Management', 'Leadership');
 
 console.log('✅ Database seeded successfully!');
 console.log('   - Ahmed (ahmed@one6.ai / 01021851321)');
-console.log('   - Abdo  (abdo@one6.ai  / 01021851321)');
