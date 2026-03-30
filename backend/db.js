@@ -1,8 +1,14 @@
 // Uses Node.js 22+ built-in sqlite (no native compilation needed)
 const { DatabaseSync } = require('node:sqlite');
 const path = require('path');
+const fs = require('fs');
 
 const dbPath = process.env.DATABASE_PATH || path.join(__dirname, 'workforce.db');
+
+// Ensure directory exists (important for volume mounts)
+fs.mkdirSync(path.dirname(dbPath), { recursive: true });
+
+console.log(`📦 Database path: ${dbPath}`);
 const db = new DatabaseSync(dbPath);
 
 // Enable WAL mode and foreign keys for better performance and integrity
