@@ -1,3 +1,6 @@
+import { useState, useEffect } from 'react'
+import api from '../../api/axios.js'
+
 const projects = [
   { name: 'English Data Annotator', icon: '🇬🇧' },
   { name: 'Russian Data Annotator', icon: '🇷🇺' },
@@ -6,6 +9,13 @@ const projects = [
 ]
 
 export default function Resources() {
+  const [credentials, setCredentials] = useState([])
+  const [showPasswords, setShowPasswords] = useState({})
+
+  useEffect(() => {
+    api.get('/me/credentials').then(res => setCredentials(res.data)).catch(() => {})
+  }, [])
+
   return (
     <div className="space-y-8 fade-in max-w-3xl">
       {/* Header */}
@@ -15,6 +25,41 @@ export default function Resources() {
           Project instructions and resources for your work.
         </p>
       </div>
+
+      {/* My Credentials */}
+      {credentials.length > 0 && (
+        <div className="space-y-4">
+          <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider">🔐 My Platform Credentials</h2>
+          <div className="space-y-3">
+            {credentials.map(cred => (
+              <div key={cred.id} className="card border-l-4 border-l-primary-500 space-y-2">
+                <p className="font-semibold text-gray-900 text-base">{cred.platform}</p>
+                {cred.username && (
+                  <div className="flex items-center gap-2 text-sm">
+                    <span className="text-gray-500 w-20">Username:</span>
+                    <span className="font-mono bg-gray-100 px-2 py-0.5 rounded text-gray-800">{cred.username}</span>
+                  </div>
+                )}
+                {cred.password && (
+                  <div className="flex items-center gap-2 text-sm">
+                    <span className="text-gray-500 w-20">Password:</span>
+                    <span className="font-mono bg-gray-100 px-2 py-0.5 rounded text-gray-800">
+                      {showPasswords[cred.id] ? cred.password : '••••••••'}
+                    </span>
+                    <button
+                      className="text-xs text-primary-600 hover:underline"
+                      onClick={() => setShowPasswords(prev => ({ ...prev, [cred.id]: !prev[cred.id] }))}
+                    >
+                      {showPasswords[cred.id] ? 'Hide' : 'Show'}
+                    </button>
+                  </div>
+                )}
+                {cred.notes && <p className="text-xs text-gray-400 italic">{cred.notes}</p>}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Quality Tips — TOP */}
       <div className="space-y-4">
@@ -38,31 +83,34 @@ export default function Resources() {
         </div>
       </div>
 
-      {/* Contact Support banner */}
-      <div className="rounded-2xl bg-gradient-to-r from-indigo-50 to-purple-50 border border-indigo-200 p-5 flex flex-col sm:flex-row items-start sm:items-center gap-4">
-        <div className="text-3xl flex-shrink-0">✅</div>
-        <div className="flex-1">
-          <p className="font-bold text-indigo-900 text-sm">Read the tips and have all the required tools installed?</p>
-          <p className="text-indigo-700 text-sm mt-1">
-            Open the <strong>Support chat</strong> on the bottom-right of the screen and send a message asking to have your <strong>login credentials added</strong>. We'll get back to you shortly.
-          </p>
-        </div>
-        <div className="text-2xl flex-shrink-0">💬</div>
-      </div>
+      {/* Contact Support banner — only shown if no credentials yet */}
+      {credentials.length === 0 && (
+        <>
+          <div className="rounded-2xl bg-gradient-to-r from-indigo-50 to-purple-50 border border-indigo-200 p-5 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+            <div className="text-3xl flex-shrink-0">✅</div>
+            <div className="flex-1">
+              <p className="font-bold text-indigo-900 text-sm">Read the tips and have all the required tools installed?</p>
+              <p className="text-indigo-700 text-sm mt-1">
+                Open the <strong>Support chat</strong> on the bottom-right of the screen and send a message asking to have your <strong>login credentials added</strong>. We'll get back to you shortly.
+              </p>
+            </div>
+            <div className="text-2xl flex-shrink-0">💬</div>
+          </div>
 
-      {/* Warning before instructions */}
-      <div className="rounded-2xl bg-red-50 border-2 border-red-200 p-5 flex items-start gap-4">
-        <div className="text-2xl flex-shrink-0">🚫</div>
-        <div>
-          <p className="font-bold text-red-800 text-sm">Do not read the project instructions yet</p>
-          <p className="text-red-700 text-sm mt-1">
-            Wait until your <strong>login credentials have been added</strong> to your account. Some projects may not be available to you, and reading the instructions for unavailable projects wastes your time.
-          </p>
-          <p className="text-red-600 text-sm mt-2 font-medium">
-            Your manager will notify you once your credentials are ready — then you can proceed.
-          </p>
-        </div>
-      </div>
+          <div className="rounded-2xl bg-red-50 border-2 border-red-200 p-5 flex items-start gap-4">
+            <div className="text-2xl flex-shrink-0">🚫</div>
+            <div>
+              <p className="font-bold text-red-800 text-sm">Do not read the project instructions yet</p>
+              <p className="text-red-700 text-sm mt-1">
+                Wait until your <strong>login credentials have been added</strong> to your account. Some projects may not be available to you, and reading the instructions for unavailable projects wastes your time.
+              </p>
+              <p className="text-red-600 text-sm mt-2 font-medium">
+                Your manager will notify you once your credentials are ready — then you can proceed.
+              </p>
+            </div>
+          </div>
+        </>
+      )}
 
       {/* Project Instructions */}
       <div className="space-y-4">
