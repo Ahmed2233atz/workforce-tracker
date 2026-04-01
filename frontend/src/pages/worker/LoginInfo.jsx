@@ -112,6 +112,25 @@ export default function LoginInfo() {
             </p>
           </div>
         </div>
+
+        {/* Backup Account */}
+        <div className="bg-indigo-50 border border-indigo-200 rounded-xl p-4 space-y-3">
+          <p className="font-semibold text-indigo-900 text-sm flex items-center gap-2">🔄 Backup Account Setup</p>
+          <p className="text-sm text-indigo-800">
+            You will be given a <strong>backup Multimango account</strong>. Watch the video below to learn how to add it and switch between accounts when needed.
+          </p>
+          <div className="rounded-xl overflow-hidden border border-indigo-200 bg-white">
+            <iframe
+              src="https://www.loom.com/embed/7fb80c15f4f14281b6f47ce8dc2a85f8"
+              frameBorder="0"
+              allowFullScreen
+              className="w-full"
+              style={{ height: '360px' }}
+              title="Multimango Backup Account Guide"
+            />
+          </div>
+          <p className="text-xs text-indigo-600 italic">If the video doesn't load, <a href="https://www.loom.com/share/7fb80c15f4f14281b6f47ce8dc2a85f8" target="_blank" rel="noreferrer" className="underline font-medium">click here to open it directly</a>.</p>
+        </div>
       </div>
 
       {/* My Credentials */}
