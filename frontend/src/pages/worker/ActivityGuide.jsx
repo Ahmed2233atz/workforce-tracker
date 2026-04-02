@@ -88,27 +88,57 @@ export default function ActivityGuide() {
         </div>
       </div>
 
-      {/* Average Time Per Project */}
-      <div className="card border border-gray-200 space-y-4">
-        <p className="font-semibold text-gray-700 text-sm uppercase tracking-wider">⏱️ Average Time Per Task</p>
-        <p className="text-sm text-gray-600">These are rough benchmarks. Working too fast or too slow can both affect your quality score.</p>
-        <div className="space-y-3">
-          {[
-            { project: 'English Annotation', time: '2–4 min', note: 'Per task, depending on complexity' },
-            { project: 'Russian Annotation', time: '3–5 min', note: 'Per task' },
-            { project: 'Chinese Annotation', time: '3–5 min', note: 'Per task' },
-            { project: 'Egyptian English Annotation', time: '2–4 min', note: 'Per task' },
-          ].map(({ project, time, note }) => (
-            <div key={project} className="flex items-center justify-between gap-4 bg-gray-50 rounded-xl px-4 py-3 border border-gray-100">
-              <div>
-                <p className="font-medium text-gray-800 text-sm">{project}</p>
-                <p className="text-xs text-gray-400 mt-0.5">{note}</p>
-              </div>
-              <span className="font-bold text-gray-700 text-sm flex-shrink-0">{time}</span>
-            </div>
-          ))}
+      {/* Average Time Per Task */}
+      <div className="rounded-2xl overflow-hidden border-2 border-orange-400 shadow-lg">
+        {/* Header */}
+        <div className="bg-orange-500 px-5 py-3 flex items-center gap-3">
+          <span className="text-2xl">⏱️</span>
+          <div>
+            <p className="text-white font-bold text-base leading-tight">Average Time Per Task</p>
+            <p className="text-orange-100 text-xs mt-0.5">You must check this before starting any task</p>
+          </div>
+          <span className="ml-auto bg-white text-orange-600 text-xs font-bold px-2.5 py-1 rounded-full uppercase tracking-wide flex-shrink-0">Critical</span>
         </div>
-        <p className="text-xs text-gray-400 italic">These times are estimates and may vary per project. Focus on quality over speed.</p>
+
+        {/* Body */}
+        <div className="bg-orange-50 px-5 py-5 space-y-4">
+          <p className="text-sm text-orange-900 leading-relaxed">
+            Every project has a <strong>specific expected time per task</strong>. Working too fast looks like you are
+            not doing the work properly. Working too slow signals low productivity. <strong>Both can get you removed.</strong>
+          </p>
+
+          {/* Step box */}
+          <div className="bg-white border-2 border-orange-300 rounded-2xl px-5 py-4 space-y-3">
+            <p className="font-bold text-orange-800 text-sm">Before starting any task, follow these steps:</p>
+            <ol className="space-y-2.5">
+              {[
+                { n: '1', text: <>Copy the <strong>exact project name</strong> from Multimango.</> },
+                { n: '2', text: <><strong>Open the time reference sheet</strong> using the button below.</> },
+                { n: '3', text: <>Search for your project name and <strong>note the expected time per task</strong>.</> },
+                { n: '4', text: <>Pace your work to match that time — not faster, not much slower.</> },
+              ].map(({ n, text }) => (
+                <li key={n} className="flex items-start gap-3 text-sm text-orange-800">
+                  <span className="w-6 h-6 rounded-full bg-orange-500 text-white flex items-center justify-center font-bold text-xs flex-shrink-0 mt-0.5">{n}</span>
+                  <span>{text}</span>
+                </li>
+              ))}
+            </ol>
+
+            <a
+              href="https://docs.google.com/document/d/1BueXqACjG4tprvxq3dSVwYxRslarfd-Tv8FLNajT3J8/edit?tab=t.0#heading=h.fxaunss91m3x"
+              target="_blank"
+              rel="noreferrer"
+              className="flex items-center justify-center gap-2 w-full mt-2 bg-orange-500 hover:bg-orange-600 text-white font-bold text-sm py-3 rounded-xl transition-colors"
+            >
+              📄 Open Task Time Reference Sheet
+            </a>
+          </div>
+
+          <div className="flex items-start gap-2.5 bg-red-50 border border-red-200 rounded-xl px-4 py-3">
+            <span className="text-red-500 text-base flex-shrink-0 mt-0.5">⚠️</span>
+            <p className="text-sm text-red-700"><strong>Do not start a task without checking the expected time first.</strong> Ignoring this is one of the leading causes of low scores and removal.</p>
+          </div>
+        </div>
       </div>
 
       {/* Bad vs Good Activity */}
