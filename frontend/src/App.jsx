@@ -14,6 +14,7 @@ import LogHours from './pages/worker/LogHours.jsx'
 import Resources from './pages/worker/Resources.jsx'
 import LoginInfo from './pages/worker/LoginInfo.jsx'
 import UpworkGuide from './pages/worker/UpworkGuide.jsx'
+import ActivityGuide from './pages/worker/ActivityGuide.jsx'
 
 export default function App() {
   return (
@@ -42,6 +43,7 @@ export default function App() {
               <Route path="/worker/resources" element={<Resources />} />
               <Route path="/worker/login-info" element={<LoginInfo />} />
               <Route path="/worker/upwork-guide" element={<UpworkGuide />} />
+              <Route path="/worker/activity-guide" element={<ActivityGuide />} />
             </Route>
           </Route>
 
