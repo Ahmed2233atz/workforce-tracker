@@ -22,18 +22,47 @@ export default function ActivityGuide() {
       </div>
 
       {/* Full Screen Rule */}
-      <div className="card border border-indigo-200 bg-indigo-50 space-y-3">
-        <p className="font-bold text-indigo-900 text-base flex items-center gap-2">🖥️ Always Work in Full Screen Mode</p>
-        <p className="text-sm text-indigo-800">
-          You must keep your browser in <strong>full screen mode</strong> at all times while working.
-          This is required for Hubstaff to correctly track your activity.
-        </p>
-        <div className="flex items-center gap-4 pt-1">
-          <div className="bg-white border border-indigo-200 rounded-xl px-5 py-3 text-center flex-shrink-0">
-            <p className="text-xs text-indigo-500 font-medium mb-0.5">Enable Full Screen</p>
-            <p className="font-bold text-indigo-900 text-2xl tracking-widest">F11</p>
+      <div className="rounded-2xl overflow-hidden border-2 border-indigo-400 shadow-lg">
+        {/* Top banner */}
+        <div className="bg-indigo-600 px-5 py-3 flex items-center gap-3">
+          <span className="text-2xl">🖥️</span>
+          <div>
+            <p className="text-white font-bold text-base leading-tight">Always Work in Full Screen Mode</p>
+            <p className="text-indigo-200 text-xs mt-0.5">This directly affects your activity score — do not skip this</p>
           </div>
-          <p className="text-sm text-indigo-700">Press <strong>F11</strong> on your keyboard to enter full screen before you start the Hubstaff timer.</p>
+          <span className="ml-auto bg-white text-indigo-700 text-xs font-bold px-2.5 py-1 rounded-full uppercase tracking-wide flex-shrink-0">Required</span>
+        </div>
+
+        {/* Body */}
+        <div className="bg-indigo-50 px-5 py-5 space-y-4">
+          <p className="text-sm text-indigo-900 leading-relaxed">
+            Hubstaff tracks activity based on your <strong>keyboard and mouse movement</strong>. Working in a small
+            or non-fullscreen window significantly reduces your detected activity — even if you are actively working.
+            <strong> This is one of the most common reasons workers get removed.</strong>
+          </p>
+
+          {/* F11 Key + instruction */}
+          <div className="flex items-center gap-5 bg-white border-2 border-indigo-300 rounded-2xl px-5 py-4">
+            <div className="flex flex-col items-center flex-shrink-0">
+              <div className="bg-indigo-600 text-white rounded-xl w-16 h-16 flex items-center justify-center shadow-md">
+                <span className="font-black text-2xl tracking-tight">F11</span>
+              </div>
+              <p className="text-xs text-indigo-500 font-medium mt-1.5">Press this key</p>
+            </div>
+            <div className="space-y-1.5">
+              <p className="font-bold text-indigo-900 text-sm">Before starting the Hubstaff timer:</p>
+              <ol className="space-y-1 text-sm text-indigo-800">
+                <li className="flex items-start gap-2"><span className="font-bold text-indigo-500 flex-shrink-0">1.</span><span>Press <strong>F11</strong> to enter full screen</span></li>
+                <li className="flex items-start gap-2"><span className="font-bold text-indigo-500 flex-shrink-0">2.</span><span>Open the Multimango platform</span></li>
+                <li className="flex items-start gap-2"><span className="font-bold text-indigo-500 flex-shrink-0">3.</span><span>Then start the Hubstaff timer</span></li>
+              </ol>
+            </div>
+          </div>
+
+          <div className="flex items-start gap-2.5 bg-red-50 border border-red-200 rounded-xl px-4 py-3">
+            <span className="text-red-500 text-base flex-shrink-0 mt-0.5">⚠️</span>
+            <p className="text-sm text-red-700"><strong>Never start the timer in a small window.</strong> Your activity will appear low and you risk removal from the project.</p>
+          </div>
         </div>
       </div>
 
