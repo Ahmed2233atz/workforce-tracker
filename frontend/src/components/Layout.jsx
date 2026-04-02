@@ -16,11 +16,11 @@ const adminNav = [
 
 const workerNav = [
   { to: '/worker/dashboard', icon: '🏠', label: 'Dashboard' },
+  { to: '/worker/activity-guide', icon: '📊', label: 'Activity Guide', badge: '⚠️ Must Read' },
   { to: '/worker/log-hours', icon: '⏱️', label: 'Log Hours' },
   { to: '/worker/resources', icon: '📚', label: 'Resources' },
   { to: '/worker/login-info', icon: '🔐', label: 'Login Info' },
   { to: '/worker/upwork-guide', icon: '💼', label: 'Upwork Hours' },
-  { to: '/worker/activity-guide', icon: '📊', label: 'Activity Guide' },
 ]
 
 function getInitials(name) {
@@ -236,7 +236,12 @@ export default function Layout() {
               }
             >
               <span className="text-base">{item.icon}</span>
-              <span>{item.label}</span>
+              <span className="flex-1">{item.label}</span>
+              {item.badge && (
+                <span className="text-xs font-bold bg-red-500 text-white px-1.5 py-0.5 rounded-md leading-tight flex-shrink-0">
+                  {item.badge}
+                </span>
+              )}
             </NavLink>
           ))}
         </nav>
