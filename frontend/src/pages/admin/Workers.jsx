@@ -4,6 +4,59 @@ import toast from 'react-hot-toast'
 import api from '../../api/axios.js'
 import Avatar from '../../components/Avatar.jsx'
 
+function WorkerIdCell({ worker, onSaved }) {
+  const [editing, setEditing] = useState(false)
+  const [value, setValue] = useState(worker.worker_code || '')
+  const [saving, setSaving] = useState(false)
+
+  const handleSave = async () => {
+    setSaving(true)
+    try {
+      await api.put(`/workers/${worker.id}`, { worker_code: value.trim() || null })
+      onSaved(worker.id, value.trim() || null)
+      toast.success('Worker ID saved')
+      setEditing(false)
+    } catch {
+      toast.error('Failed to save')
+    } finally { setSaving(false) }
+  }
+
+  if (editing) {
+    return (
+      <div className="flex items-center gap-1">
+        <input
+          autoFocus
+          className="border border-indigo-300 rounded-lg px-2 py-0.5 text-xs font-mono w-24 focus:outline-none focus:ring-2 focus:ring-indigo-300"
+          value={value}
+          onChange={e => setValue(e.target.value)}
+          onKeyDown={e => { if (e.key === 'Enter') handleSave(); if (e.key === 'Escape') setEditing(false) }}
+          placeholder="e.g. W-001"
+        />
+        <button onClick={handleSave} disabled={saving} className="text-xs bg-indigo-600 text-white px-2 py-0.5 rounded-lg font-medium hover:bg-indigo-700 disabled:opacity-50">
+          {saving ? '…' : '✓'}
+        </button>
+        <button onClick={() => setEditing(false)} className="text-xs text-gray-400 hover:text-gray-600">✕</button>
+      </div>
+    )
+  }
+
+  return (
+    <div className="flex items-center gap-1.5 group">
+      {worker.worker_code
+        ? <span className="font-mono text-xs font-semibold text-indigo-700 bg-indigo-50 border border-indigo-200 px-2 py-0.5 rounded-full">{worker.worker_code}</span>
+        : <span className="text-gray-300 text-xs">—</span>
+      }
+      <button
+        onClick={() => { setValue(worker.worker_code || ''); setEditing(true) }}
+        className="text-xs text-indigo-400 hover:text-indigo-700 opacity-0 group-hover:opacity-100 transition-opacity"
+        title={worker.worker_code ? 'Edit ID' : 'Assign ID'}
+      >
+        {worker.worker_code ? '✎' : '+ Add'}
+      </button>
+    </div>
+  )
+}
+
 function Modal({ title, onClose, children }) {
   return (
     <div className="modal-backdrop" onClick={onClose}>
@@ -292,10 +345,10 @@ export default function Workers() {
                       </div>
                     </td>
                     <td>
-                      {w.worker_code
-                        ? <span className="font-mono text-xs font-semibold text-indigo-700 bg-indigo-50 border border-indigo-200 px-2 py-0.5 rounded-full">{w.worker_code}</span>
-                        : <span className="text-gray-300 text-xs">—</span>
-                      }
+                      <WorkerIdCell
+                        worker={w}
+                        onSaved={(id, code) => setWorkers(prev => prev.map(x => x.id === id ? { ...x, worker_code: code } : x))}
+                      />
                     </td>
                     <td className="text-gray-500 text-sm">{w.email}</td>
                     <td>
