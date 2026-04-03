@@ -61,6 +61,7 @@ router.get('/me', authenticate, (req, res) => {
     created_at: req.user.created_at,
     instructions: req.user.instructions,
     avatar_url: req.user.avatar_url,
+    worker_code: req.user.worker_code,
   });
 });
 

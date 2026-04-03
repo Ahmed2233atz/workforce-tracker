@@ -12,6 +12,60 @@ import Avatar from '../../components/Avatar.jsx'
 
 const TABS = ['Hours History', 'Credentials', 'Notes & Warnings', 'Pending Backfills']
 
+function WorkerCodeBadge({ worker, onSaved }) {
+  const [editing, setEditing] = useState(false)
+  const [value, setValue] = useState(worker.worker_code || '')
+  const [saving, setSaving] = useState(false)
+
+  const handleSave = async () => {
+    setSaving(true)
+    try {
+      await api.put(`/workers/${worker.id}`, { worker_code: value.trim() || null })
+      onSaved(value.trim() || null)
+      toast.success('Worker ID saved')
+      setEditing(false)
+    } catch {
+      toast.error('Failed to save')
+    } finally { setSaving(false) }
+  }
+
+  if (editing) {
+    return (
+      <span className="flex items-center gap-1">
+        <input
+          autoFocus
+          className="border border-indigo-300 rounded-lg px-2 py-0.5 text-xs font-mono w-28 focus:outline-none focus:ring-2 focus:ring-indigo-300"
+          value={value}
+          onChange={e => setValue(e.target.value)}
+          onKeyDown={e => { if (e.key === 'Enter') handleSave(); if (e.key === 'Escape') setEditing(false) }}
+          placeholder="e.g. W-001"
+        />
+        <button onClick={handleSave} disabled={saving} className="text-xs bg-indigo-600 text-white px-2 py-0.5 rounded-lg font-medium hover:bg-indigo-700 disabled:opacity-50">
+          {saving ? '…' : 'Save'}
+        </button>
+        <button onClick={() => setEditing(false)} className="text-xs text-gray-400 hover:text-gray-600 px-1">✕</button>
+      </span>
+    )
+  }
+
+  return worker.worker_code ? (
+    <button
+      onClick={() => { setValue(worker.worker_code); setEditing(true) }}
+      className="flex items-center gap-1 text-xs bg-indigo-100 text-indigo-700 border border-indigo-200 px-2 py-0.5 rounded-full font-mono font-semibold hover:bg-indigo-200 transition-colors"
+      title="Click to edit Worker ID"
+    >
+      🪪 {worker.worker_code} <span className="text-indigo-400 font-sans font-normal">✎</span>
+    </button>
+  ) : (
+    <button
+      onClick={() => setEditing(true)}
+      className="text-xs text-indigo-500 border border-dashed border-indigo-300 px-2 py-0.5 rounded-full hover:bg-indigo-50 transition-colors"
+    >
+      + Assign ID
+    </button>
+  )
+}
+
 function WorkerAvatarUpload({ worker, onUploaded }) {
   const fileRef = useRef()
   const [uploading, setUploading] = useState(false)
@@ -229,9 +283,10 @@ export default function WorkerDetail() {
                 )}
               </div>
               <p className="text-gray-500 text-sm mt-0.5">{worker.email}</p>
-              <div className="flex gap-3 mt-2 flex-wrap">
+              <div className="flex gap-3 mt-2 flex-wrap items-center">
                 {worker.department && <span className="text-xs bg-primary-50 text-primary-700 px-2 py-0.5 rounded-full">{worker.department}</span>}
                 {worker.team && <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">{worker.team}</span>}
+                <WorkerCodeBadge worker={worker} onSaved={(code) => setWorker(w => ({ ...w, worker_code: code }))} />
               </div>
             </div>
           </div>

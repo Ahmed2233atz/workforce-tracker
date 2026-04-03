@@ -17,7 +17,7 @@ router.get('/', (req, res) => {
   const workers = db.prepare(`
     SELECT
       u.id, u.name, u.email, u.department, u.team, u.role, u.is_active,
-      u.created_at, u.instructions,
+      u.created_at, u.instructions, u.worker_code,
       h.total_hours AS today_hours,
       h.start_time AS today_start,
       h.end_time AS today_end
@@ -68,7 +68,7 @@ router.post('/', (req, res) => {
 router.get('/:id', (req, res) => {
   const { id } = req.params;
 
-  const worker = db.prepare('SELECT id, name, email, role, department, team, is_active, created_at, instructions FROM users WHERE id = ? AND role = ?').get(id, 'worker');
+  const worker = db.prepare('SELECT id, name, email, role, department, team, is_active, created_at, instructions, worker_code FROM users WHERE id = ? AND role = ?').get(id, 'worker');
   if (!worker) {
     return res.status(404).json({ error: 'Worker not found' });
   }
@@ -105,7 +105,7 @@ router.get('/:id', (req, res) => {
 // PUT /api/workers/:id - update worker
 router.put('/:id', (req, res) => {
   const { id } = req.params;
-  const { name, email, department, team, is_active, instructions } = req.body;
+  const { name, email, department, team, is_active, instructions, worker_code } = req.body;
 
   const worker = db.prepare('SELECT id FROM users WHERE id = ?').get(id);
   if (!worker) {
@@ -127,6 +127,7 @@ router.put('/:id', (req, res) => {
         team = COALESCE(?, team),
         is_active = COALESCE(?, is_active),
         instructions = CASE WHEN ? IS NOT NULL THEN ? ELSE instructions END,
+        worker_code = CASE WHEN ? IS NOT NULL THEN ? ELSE worker_code END,
         updated_at = datetime('now')
     WHERE id = ?
   `).run(
@@ -137,6 +138,8 @@ router.put('/:id', (req, res) => {
     is_active !== undefined ? (is_active ? 1 : 0) : null,
     instructions !== undefined ? instructions : null,
     instructions !== undefined ? instructions : null,
+    worker_code !== undefined ? worker_code : null,
+    worker_code !== undefined ? worker_code : null,
     id
   );
 
@@ -149,7 +152,7 @@ router.put('/:id', (req, res) => {
     } catch (e) {}
   }
 
-  const updated = db.prepare('SELECT id, name, email, role, department, team, is_active, instructions, created_at FROM users WHERE id = ?').get(id);
+  const updated = db.prepare('SELECT id, name, email, role, department, team, is_active, instructions, worker_code, created_at FROM users WHERE id = ?').get(id);
   return res.json(updated);
 });
 

@@ -95,6 +95,11 @@ try {
   // already exists
 }
 
+// Migration: add worker_code column to users
+try {
+  db.exec('ALTER TABLE users ADD COLUMN worker_code TEXT');
+} catch (e) { /* already exists */ }
+
 db.exec(`
   CREATE TABLE IF NOT EXISTS notifications (
     id INTEGER PRIMARY KEY AUTOINCREMENT,

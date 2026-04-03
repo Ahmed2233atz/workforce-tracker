@@ -85,9 +85,20 @@ export default function WorkerDashboard() {
   return (
     <div className="space-y-6 fade-in max-w-4xl">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">{greeting()}, {user?.name?.split(' ')[0]}! 👋</h1>
-        <p className="text-gray-500 text-sm mt-0.5">{format(new Date(), 'EEEE, MMMM d, yyyy')}</p>
+      <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">{greeting()}, {user?.name?.split(' ')[0]}! 👋</h1>
+          <p className="text-gray-500 text-sm mt-0.5">{format(new Date(), 'EEEE, MMMM d, yyyy')}</p>
+        </div>
+        {user?.worker_code && (
+          <div className="flex items-center gap-2 bg-indigo-50 border border-indigo-200 rounded-xl px-4 py-2 flex-shrink-0">
+            <span className="text-lg">🪪</span>
+            <div>
+              <p className="text-xs text-indigo-500 font-medium leading-tight">Your Worker ID</p>
+              <p className="font-bold text-indigo-800 font-mono tracking-wider text-base leading-tight">{user.worker_code}</p>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Notifications */}
