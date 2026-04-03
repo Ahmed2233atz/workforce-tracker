@@ -258,6 +258,7 @@ export default function Workers() {
             <thead>
               <tr>
                 <th>Worker</th>
+                <th>ID</th>
                 <th>Email</th>
                 <th>Department / Team</th>
                 <th>Today</th>
@@ -269,14 +270,14 @@ export default function Workers() {
               {loading ? (
                 [...Array(5)].map((_, i) => (
                   <tr key={i}>
-                    {[...Array(6)].map((_, j) => (
+                    {[...Array(7)].map((_, j) => (
                       <td key={j} className="px-4 py-3"><div className="skeleton h-4 rounded w-20" /></td>
                     ))}
                   </tr>
                 ))
               ) : filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="text-center py-12 text-gray-400">
+                  <td colSpan={7} className="text-center py-12 text-gray-400">
                     <div className="text-4xl mb-2">👤</div>
                     No workers found
                   </td>
@@ -289,6 +290,12 @@ export default function Workers() {
                         <Avatar name={w.name} avatarUrl={w.avatar_url} size={32} />
                         <span className="font-medium text-gray-900 hover:text-primary-600">{w.name}</span>
                       </div>
+                    </td>
+                    <td>
+                      {w.worker_code
+                        ? <span className="font-mono text-xs font-semibold text-indigo-700 bg-indigo-50 border border-indigo-200 px-2 py-0.5 rounded-full">{w.worker_code}</span>
+                        : <span className="text-gray-300 text-xs">—</span>
+                      }
                     </td>
                     <td className="text-gray-500 text-sm">{w.email}</td>
                     <td>
